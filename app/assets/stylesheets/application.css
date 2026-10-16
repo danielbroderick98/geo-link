@@ -8,3 +8,45 @@
  *
  * Consider organizing styles into separate files for maintainability.
  */
+.geo-home {
+  background-color: #101e36;
+  color: #f4f7f2;
+}
+
+.geo-accent {
+  color: #c4edb2;
+}
+
+.geo-muted {
+  color: #b9c5d4;
+}
+
+.geo-badge {
+  color: #c4edb2;
+  background-color: #203b38;
+  border: 1px solid #52674f;
+}
+
+.geo-button {
+  --bs-btn-color: #101e36;
+  --bs-btn-bg: #c4edb2;
+  --bs-btn-border-color: #c4edb2;
+  --bs-btn-hover-color: #101e36;
+  --bs-btn-hover-bg: #d8f6cb;
+  --bs-btn-hover-border-color: #d8f6cb;
+  --bs-btn-active-color: #101e36;
+  --bs-btn-active-bg: #b1dba0;
+  --bs-btn-active-border-color: #b1dba0;
+  --bs-btn-focus-shadow-rgb: 196, 237, 178;
+  font-weight: 600;
+}
+
+.geo-card {
+  background-color: #182942;
+  color: #f4f7f2;
+  border-color: #34445b;
+}
+
+.geo-footer {
+  border-top: 1px solid #34445b;
+}
