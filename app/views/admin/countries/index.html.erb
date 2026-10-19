@@ -1,0 +1,248 @@
+<div class="geo-home min-vh-100">
+  <header class="border-bottom border-secondary">
+    <nav class="container py-4 d-flex justify-content-between align-items-center"
+         aria-label="Admin navigation">
+      <%# Link the logo to the homepage. %>
+      <%= link_to root_path, class: "fs-3 fw-bold text-decoration-none text-light" do %>
+        Geo<span class="geo-accent">Link</span>
+      <% end %>
+
+      <span class="badge rounded-pill geo-badge px-3 py-2">
+        Admin workspace
+      </span>
+    </nav>
+  </header>
+
+  <main class="container py-5">
+    <%# Show confirmation after successfully saving a country. %>
+    <% if flash[:notice].present? %>
+      <div class="alert alert-success" role="status">
+        <%= flash[:notice] %>
+      </div>
+    <% end %>
+
+    <div class="mb-4">
+      <%= link_to "← Back to home", root_path,
+          class: "geo-accent text-decoration-none small" %>
+    </div>
+
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+      <div>
+        <p class="geo-accent small fw-bold text-uppercase mb-2">
+          Country management
+        </p>
+        <h1 class="display-6 fw-bold">Manage countries</h1>
+        <p class="geo-muted mb-0">
+          Manage country profiles and their availability on Geo Link.
+        </p>
+      </div>
+
+      <span class="badge rounded-pill geo-badge px-3 py-2">
+        Country administration
+      </span>
+    </div>
+
+    <div class="row g-4">
+      <div class="col-xl-4">
+        <section class="card geo-card rounded-4">
+          <div class="card-body p-4">
+            <h2 class="h4 mb-2">Add a country</h2>
+            <p class="geo-muted small mb-4">
+              Enter the country's details below.
+            </p>
+
+            <%# Show validation errors without clearing the entered details. %>
+            <% if @country.errors.any? %>
+              <div class="alert alert-danger" role="alert">
+                <p class="fw-semibold mb-2">Please check the following:</p>
+                <ul class="mb-0">
+                  <% @country.errors.full_messages.each do |message| %>
+                    <li><%= message %></li>
+                  <% end %>
+                </ul>
+              </div>
+            <% end %>
+
+            <%# Submit the country details to the create action. %>
+            <%= form_with model: [:admin, @country] do |form| %>
+              <div class="mb-3">
+                <%= form.label :name, "Country name", class: "form-label" %>
+                <%= form.text_field :name,
+                    class: "form-control geo-input",
+                    placeholder: "e.g. Ireland",
+                    required: true %>
+              </div>
+
+              <div class="mb-3">
+                <%= form.label :region, class: "form-label" %>
+                <%= form.select :region,
+                    Country::REGIONS,
+                    { prompt: "Select a region" },
+                    { class: "form-select geo-input", required: true } %>
+              </div>
+
+              <div class="mb-3">
+                <%= form.label :capital, class: "form-label" %>
+                <%= form.text_field :capital,
+                    class: "form-control geo-input",
+                    placeholder: "e.g. Dublin",
+                    required: true %>
+              </div>
+
+              <div class="mb-3">
+                <%= form.label :population, class: "form-label" %>
+                <%= form.number_field :population,
+                    class: "form-control geo-input",
+                    min: 0,
+                    step: 1,
+                    placeholder: "Enter population",
+                    required: true %>
+              </div>
+
+              <div class="mb-3">
+                <%= form.label :political_system, class: "form-label" %>
+                <%= form.text_field :political_system,
+                    class: "form-control geo-input",
+                    placeholder: "e.g. Parliamentary republic",
+                    required: true %>
+              </div>
+
+              <div class="mb-4">
+                <%= form.label :active, "Status", class: "form-label" %>
+                <%= form.select :active,
+                    [["Active", true], ["Inactive", false]],
+                    {},
+                    { class: "form-select geo-input" } %>
+                <p class="geo-muted small mt-2 mb-0">
+                  Set whether this country is available for use in Geo Link.
+                </p>
+              </div>
+
+              <%= form.submit "Add country", class: "btn geo-button w-100" %>
+            <% end %>
+          </div>
+        </section>
+      </div>
+
+      <div class="col-xl-8">
+        <section class="card geo-card rounded-4">
+          <div class="card-body p-4">
+            <div class="d-flex justify-content-between align-items-center gap-3 mb-4">
+              <div>
+                <h2 class="h4 mb-1">Countries</h2>
+                <p class="geo-muted small mb-0">
+                  Countries stored in Geo Link.
+                </p>
+              </div>
+
+              <span class="badge rounded-pill geo-badge">
+                <%# Display the number of saved countries. %>
+                <%= pluralize(@countries.size, "country") %>
+              </span>
+            </div>
+
+            <div class="row g-3 mb-4">
+              <div class="col-md-8">
+                <label for="country-search" class="visually-hidden">
+                  Search countries
+                </label>
+                <input id="country-search"
+                       type="search"
+                       class="form-control geo-input"
+                       placeholder="Search countries — coming soon"
+                       disabled>
+              </div>
+
+              <div class="col-md-4">
+                <label for="country-status-filter" class="visually-hidden">
+                  Filter by status
+                </label>
+                <select id="country-status-filter"
+                        class="form-select geo-input"
+                        disabled>
+                  <option>All statuses</option>
+                  <option>Active</option>
+                  <option>Inactive</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="table-responsive">
+              <table class="table geo-table align-middle mb-0">
+                <caption class="visually-hidden">
+                  Countries stored in Geo Link.
+                </caption>
+
+                <thead>
+                  <tr>
+                    <th scope="col">Country / Region</th>
+                    <th scope="col">Capital</th>
+                    <th scope="col" class="text-end">Population</th>
+                    <th scope="col">Political system</th>
+                    <th scope="col">Status</th>
+                    <th scope="col" class="text-end">Actions</th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  <%# Display a row for each country loaded from the database. %>
+                  <% @countries.each do |country| %>
+                    <tr>
+                      <th scope="row" class="py-3">
+                        <div class="fw-semibold"><%= country.name %></div>
+                        <div class="geo-muted small fw-normal">
+                          <%= country.region %>
+                        </div>
+                      </th>
+
+                      <td><%= country.capital %></td>
+
+                      <%# Add thousands separators to the population. %>
+                      <td class="text-end">
+                        <%= number_with_delimiter(country.population) %>
+                      </td>
+
+                      <td><%= country.political_system %></td>
+
+                      <%# Show the Boolean status as an Active or Inactive badge. %>
+                      <td>
+                        <span class="badge rounded-pill <%= country.active? ? 'geo-badge' : 'geo-badge-inactive' %>">
+                          <%= country.active? ? "Active" : "Inactive" %>
+                        </span>
+                      </td>
+
+                      <td class="text-end text-nowrap">
+                        <button type="button"
+                                class="btn btn-sm btn-outline-light"
+                                aria-label="Edit <%= country.name %>"
+                                disabled>
+                          Edit
+                        </button>
+
+                        <button type="button"
+                                class="btn btn-sm btn-outline-danger ms-1"
+                                aria-label="Delete <%= country.name %>"
+                                disabled>
+                          Delete
+                        </button>
+                      </td>
+                    </tr>
+                  <% end %>
+
+                  <%# Show an empty state before the first country is added. %>
+                  <% if @countries.empty? %>
+                    <tr>
+                      <td colspan="6" class="text-center py-5">
+                        No countries yet. Add your first country using the form.
+                      </td>
+                    </tr>
+                  <% end %>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+  </main>
+</div>

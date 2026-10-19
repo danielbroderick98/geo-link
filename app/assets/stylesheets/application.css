@@ -50,3 +50,69 @@
 .geo-footer {
   border-top: 1px solid #34445b;
 }
+
+.geo-input {
+  background-color: #101e36;
+  border-color: #526078;
+  color: #f4f7f2;
+}
+
+.geo-input::placeholder {
+  color: #aab8ca;
+  opacity: 1;
+}
+
+.geo-input:focus {
+  background-color: #101e36;
+  border-color: #c4edb2;
+  color: #f4f7f2;
+  box-shadow: 0 0 0 0.2rem rgb(196 237 178 / 20%);
+}
+
+.geo-input:disabled {
+  background-color: #15233b;
+  color: #aab8ca;
+}
+
+select.geo-input {
+  color-scheme: dark;
+}
+
+.geo-table {
+  --bs-table-bg: transparent;
+  --bs-table-color: #f4f7f2;
+  --bs-table-border-color: #34445b;
+}
+
+.geo-table thead th {
+  color: #b9c5d4;
+  font-size: 0.8rem;
+  font-weight: 500;
+  padding-bottom: 16px;
+}
+
+.geo-table .geo-muted {
+  color: #b9c5d4;
+}
+
+.geo-button:disabled {
+  background-color: #c4edb2;
+  border-color: #c4edb2;
+  color: #101e36;
+  opacity: 0.65;
+}
+
+.geo-badge-inactive {
+  color: #d3dce8;
+  background-color: #34445b;
+  border: 1px solid #66758b;
+}
+
+.geo-table td,
+.geo-table th {
+  min-width: 95px;
+}
+
+.geo-table caption {
+  padding-top: 16px;
+}
