@@ -1,0 +1,69 @@
+<%# Show validation errors without clearing the entered details. %>
+<% if country.errors.any? %>
+  <div class="alert alert-danger" role="alert">
+    <p class="fw-semibold mb-2">Please check the following:</p>
+    <ul class="mb-0">
+      <% country.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+    </ul>
+  </div>
+<% end %>
+
+<%# Submit the country details to the create action. %>
+<%= form_with model: [:admin, country] do |form| %>
+  <div class="mb-3">
+    <%= form.label :name, "Country name", class: "form-label" %>
+    <%= form.text_field :name,
+        class: "form-control geo-input",
+        placeholder: "e.g. Ireland",
+        required: true %>
+  </div>
+
+  <div class="mb-3">
+    <%= form.label :region, class: "form-label" %>
+    <%= form.select :region,
+        Country::REGIONS,
+        { prompt: "Select a region" },
+        { class: "form-select geo-input", required: true } %>
+  </div>
+
+  <div class="mb-3">
+    <%= form.label :capital, class: "form-label" %>
+    <%= form.text_field :capital,
+        class: "form-control geo-input",
+        placeholder: "e.g. Dublin",
+        required: true %>
+  </div>
+
+  <div class="mb-3">
+    <%= form.label :population, class: "form-label" %>
+    <%= form.number_field :population,
+        class: "form-control geo-input",
+        min: 0,
+        step: 1,
+        placeholder: "Enter population",
+        required: true %>
+  </div>
+
+  <div class="mb-3">
+    <%= form.label :political_system, class: "form-label" %>
+    <%= form.text_field :political_system,
+        class: "form-control geo-input",
+        placeholder: "e.g. Parliamentary republic",
+        required: true %>
+  </div>
+
+  <div class="mb-4">
+    <%= form.label :active, "Status", class: "form-label" %>
+    <%= form.select :active,
+        [["Active", true], ["Inactive", false]],
+        {},
+        { class: "form-select geo-input" } %>
+    <p class="geo-muted small mt-2 mb-0">
+      Set whether this country is available for use in Geo Link.
+    </p>
+  </div>
+
+  <%= form.submit(country.persisted? ? "Save changes" : "Add country", class: "btn geo-button w-100") %>
+<% end %>

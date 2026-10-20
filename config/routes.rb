@@ -1,7 +1,7 @@
 Rails.application.routes.draw do
   namespace :admin do
     # Display countries and accept submissions for new countries.
-    resources :countries, only: [:index, :create]
+    resources :countries, only: [:index, :create, :edit, :update]
   end
   root "home#index"
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html

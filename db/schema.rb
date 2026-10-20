@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_18_203338) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_19_064305) do
   create_table "countries", force: :cascade do |t|
     t.string "name", null: false
     t.string "region", null: false
@@ -22,5 +22,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_18_203338) do
     t.datetime "updated_at", null: false
     t.index "LOWER(name)", name: "index_countries_on_lower_name", unique: true
     t.check_constraint "population >= 0", name: "countries_population_non_negative"
+  end
+
+  create_table "users", force: :cascade do |t|
+    t.string "name"
+    t.string "email"
+    t.string "password_digest"
+    t.string "role", default: "user"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 end
