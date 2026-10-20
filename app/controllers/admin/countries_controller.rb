@@ -1,5 +1,5 @@
 class Admin::CountriesController < ApplicationController
-  before_action :set_country, only: [:edit, :update]
+  before_action :set_country, only: [ :edit, :update ]
 
   def index
     @country = Country.new

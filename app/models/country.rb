@@ -27,5 +27,5 @@ class Country < ApplicationRecord
             }
 
   # Both true and false are valid; a missing value is not.
-  validates :active, inclusion: { in: [true, false] }
+  validates :active, inclusion: { in: [ true, false ] }
 end
