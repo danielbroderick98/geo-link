@@ -1,0 +1,64 @@
+<div class="geo-home min-vh-100">
+    <header class="border-bottom border-secondary">
+        <nav class="container py-4 d-flex justify-content-between align-items-center"
+            aria-label="Admin navigation">
+        <%# Link the logo to the homepage. %>
+        <%= link_to root_path,
+            class: "fs-3 fw-bold text-decoration-none text-light" do %>
+            Geo<span class="geo-accent">Link</span>
+        <% end %>
+
+        <span class="badge rounded-pill geo-badge px-3 py-2">
+            Admin workspace
+        </span>
+        </nav>
+    </header>
+
+    <main class="container py-5">
+        <%# Return to the event list without submitting the form. %>
+        <div class="mb-4">
+        <%= link_to "← Back to events", admin_geopolitical_events_path,
+            class: "geo-accent text-decoration-none small" %>
+        </div>
+
+        <div class="mb-4">
+        <p class="geo-accent small fw-bold text-uppercase mb-2">
+            Event management
+        </p>
+
+        <h1 class="display-6 fw-bold">Edit geopolitical event</h1>
+
+        <p class="geo-muted mb-0">
+            Update the details and countries involved in
+            <%= @geopolitical_event.title %>.
+        </p>
+        </div>
+
+        <%# Keep the edit form centred with a comfortable width. %>
+        <div class="row justify-content-center">
+        <div class="col-lg-8 col-xl-6">
+            <section class="card geo-card rounded-4">
+            <div class="card-body p-4">
+                <h2 class="h4 mb-2">Event details</h2>
+
+                <p class="geo-muted small mb-4">
+                Leave the end date blank if the event is ongoing.
+                </p>
+
+                <%# Reuse the form with the event loaded by the controller.
+                    Existing values and country selections appear automatically.
+                    The form also displays any validation errors after saving. %>
+                <%= render "form",
+                    geopolitical_event: @geopolitical_event %>
+
+                <%# Cancel editing and return to the event list. %>
+                <div class="text-center mt-3">
+                <%= link_to "Cancel", admin_geopolitical_events_path,
+                    class: "geo-accent text-decoration-none" %>
+                </div>
+            </div>
+            </section>
+        </div>
+        </div>
+    </main>
+</div>

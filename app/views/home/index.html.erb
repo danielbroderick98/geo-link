@@ -32,6 +32,22 @@
         <a href="#project-status" class="btn geo-button btn-lg">
           Explore the project &rarr;
         </a>
+
+        <%# Open the admin pages for managing countries and events. %>
+        <div class="d-flex flex-wrap gap-3 mt-3">
+          <%= link_to "Manage countries",
+              admin_countries_path,
+              class: "btn geo-button" %>
+
+          <%= link_to "Manage geopolitical events",
+              admin_geopolitical_events_path,
+              class: "btn geo-button" %>
+          
+          <%# Open the diplomatic relationships management page. %>
+          <%= link_to "Manage diplomatic relationships",
+              admin_diplomatic_relationships_path,
+              class: "btn geo-button" %>
+        </div>
       </div>
 
       <div class="col-lg-5">

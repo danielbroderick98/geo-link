@@ -1,0 +1,182 @@
+<div class="geo-home min-vh-100">
+    <%# Display the Geo Link header and link back to the homepage. %>
+    <header class="border-bottom border-secondary">
+    <nav class="container py-4 d-flex justify-content-between align-items-center"
+        aria-label="Admin navigation">
+        <%= link_to root_path,
+            class: "fs-3 fw-bold text-decoration-none text-light" do %>
+        Geo<span class="geo-accent">Link</span>
+        <% end %>
+
+        <span class="badge rounded-pill geo-badge px-3 py-2">
+        Admin workspace
+        </span>
+    </nav>
+    </header>
+    <main class="container py-5">
+        <%# Display confirmation or error messages from the controller. %>
+        <% if flash[:notice].present? %>
+        <div class="alert alert-success" role="status">
+            <%= flash[:notice] %>
+        </div>
+        <% end %>
+
+        <% if flash[:alert].present? %>
+        <div class="alert alert-danger" role="alert">
+            <%= flash[:alert] %>
+        </div>
+        <% end %>
+
+        <div class="mb-4">
+        <%= link_to "← Back to home", root_path,
+            class: "geo-accent text-decoration-none small" %>
+        </div>
+
+        <div class="mb-4">
+        <p class="geo-accent small fw-bold text-uppercase mb-2">
+            Relationship management
+        </p>
+        <h1 class="display-6 fw-bold">Diplomatic relationships</h1>
+        <p class="geo-muted">
+            Manage relationships between countries in Geo Link.
+        </p>
+        </div>
+
+        <div class="row g-4">
+        <div class="col-xl-4">
+            <section class="card geo-card rounded-4">
+            <div class="card-body p-4">
+                <h2 class="h4 mb-4">Add a relationship</h2>
+
+                <%# Display validation errors after an unsuccessful submission. %>
+                <% if @diplomatic_relationship.errors.any? %>
+                <div class="alert alert-danger" role="alert">
+                    <p class="fw-semibold mb-2">Please check the following:</p>
+                    <ul class="mb-0">
+                    <% @diplomatic_relationship.errors.full_messages.each do |message| %>
+                        <li><%= message %></li>
+                    <% end %>
+                    </ul>
+                </div>
+                <% end %>
+
+                <%# Submit a new relationship to the admin controller. %>
+                <%= form_with model: [:admin, @diplomatic_relationship] do |form| %>
+                <div class="mb-3">
+                    <%= form.label :country_1_id, "Country 1",
+                        class: "form-label" %>
+
+                    <%# Use country IDs as values and names as visible labels. %>
+                    <%= form.collection_select :country_1_id,
+                        @countries, :id, :name,
+                        { prompt: "Select Country 1" },
+                        { class: "form-select geo-input", required: true } %>
+                </div>
+
+                <div class="mb-3">
+                    <%= form.label :country_2_id, "Country 2",
+                        class: "form-label" %>
+
+                    <%= form.collection_select :country_2_id,
+                        @countries, :id, :name,
+                        { prompt: "Select Country 2" },
+                        { class: "form-select geo-input", required: true } %>
+                </div>
+
+                <div class="mb-4">
+                    <%= form.label :relationship_type, "Relationship type",
+                        class: "form-label" %>
+
+                    <%= form.text_field :relationship_type,
+                        class: "form-control geo-input",
+                        placeholder: "e.g. Allied, Neutral, or Hostile",
+                        required: true %>
+                </div>
+
+                <%= form.submit "Add relationship",
+                    class: "btn geo-button w-100" %>
+                <% end %>
+            </div>
+            </section>
+        </div>
+
+        <div class="col-xl-8">
+            <section class="card geo-card rounded-4">
+            <div class="card-body p-4">
+                <div class="d-flex justify-content-between align-items-center gap-3 mb-4">
+                <h2 class="h4 mb-0">Saved relationships</h2>
+
+                <%# Show the number of relationships in the database. %>
+                <span class="badge rounded-pill geo-badge">
+                    <%= pluralize(@diplomatic_relationships.size, "relationship") %>
+                </span>
+                </div>
+
+                <div class="table-responsive">
+                <table class="table geo-table align-middle mb-0">
+                    <caption class="visually-hidden">
+                    Diplomatic relationships stored in Geo Link.
+                    </caption>
+
+                    <thead>
+                    <tr>
+                        <th scope="col">Country 1</th>
+                        <th scope="col">Country 2</th>
+                        <th scope="col">Relationship type</th>
+                        <th scope="col" class="text-end">Actions</th>
+                    </tr>
+                    </thead>
+
+                    <tbody>
+                    <%# Display each relationship and its associated countries. %>
+                    <% @diplomatic_relationships.each do |relationship| %>
+                        <tr>
+                        <th scope="row" class="py-3 fw-semibold">
+                            <%= relationship.country_1.name %>
+                        </th>
+                        <td><%= relationship.country_2.name %></td>
+                        <td><%= relationship.relationship_type %></td>
+
+                        <td class="text-end text-nowrap">
+                            <%= link_to "Edit",
+                                edit_admin_diplomatic_relationship_path(relationship),
+                                class: "btn btn-sm btn-outline-light",
+                                aria: {
+                                label: "Edit relationship between #{relationship.country_1.name} and #{relationship.country_2.name}"
+                                } %>
+
+                            <%# A form button sends a DELETE request to the controller. %>
+                            <%= button_to "Delete",
+                                admin_diplomatic_relationship_path(relationship),
+                                method: :delete,
+                                class: "btn btn-sm btn-outline-danger",
+                                form: {
+                                class: "d-inline-block ms-1",
+                                data: {
+                                    turbo_confirm: "Delete this diplomatic relationship?"
+                                }
+                                },
+                                aria: {
+                                label: "Delete relationship between #{relationship.country_1.name} and #{relationship.country_2.name}"
+                                } %>
+                        </td>
+                        </tr>
+                    <% end %>
+
+                    <%# Display an empty state before any relationships are added. %>
+                    <% if @diplomatic_relationships.empty? %>
+                        <tr>
+                        <td colspan="4" class="text-center py-5">
+                            No diplomatic relationships yet. Add one using the form.
+                        </td>
+                        </tr>
+                    <% end %>
+                    </tbody>
+                </table>
+                </div>
+            </div>
+            </section>
+        </div>
+        </div>
+    </main>
+</div>

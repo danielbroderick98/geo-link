@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_19_064305) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_22_062537) do
   create_table "countries", force: :cascade do |t|
     t.string "name", null: false
     t.string "region", null: false
@@ -24,6 +24,36 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_19_064305) do
     t.check_constraint "population >= 0", name: "countries_population_non_negative"
   end
 
+  create_table "diplomatic_relationships", force: :cascade do |t|
+    t.integer "country_1_id", null: false
+    t.integer "country_2_id", null: false
+    t.string "relationship_type"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["country_1_id"], name: "index_diplomatic_relationships_on_country_1_id"
+    t.index ["country_2_id"], name: "index_diplomatic_relationships_on_country_2_id"
+  end
+
+  create_table "event_countries", force: :cascade do |t|
+    t.integer "geopolitical_event_id", null: false
+    t.integer "country_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["country_id"], name: "index_event_countries_on_country_id"
+    t.index ["geopolitical_event_id", "country_id"], name: "index_event_countries_on_geopolitical_event_id_and_country_id", unique: true
+    t.index ["geopolitical_event_id"], name: "index_event_countries_on_geopolitical_event_id"
+  end
+
+  create_table "geopolitical_events", force: :cascade do |t|
+    t.string "title"
+    t.string "event_type"
+    t.date "started_on"
+    t.date "ended_on"
+    t.text "description"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "users", force: :cascade do |t|
     t.string "name"
     t.string "email"
@@ -32,4 +62,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_19_064305) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
+
+  add_foreign_key "diplomatic_relationships", "country_1s"
+  add_foreign_key "diplomatic_relationships", "country_2s"
+  add_foreign_key "event_countries", "countries"
+  add_foreign_key "event_countries", "geopolitical_events"
 end

@@ -1,0 +1,165 @@
+<div class="geo-home min-vh-100">
+<header class="border-bottom border-secondary">
+    <nav class="container py-4 d-flex justify-content-between align-items-center"
+        aria-label="Admin navigation">
+    <%# Link the logo to the homepage. %>
+    <%= link_to root_path,
+        class: "fs-3 fw-bold text-decoration-none text-light" do %>
+        Geo<span class="geo-accent">Link</span>
+    <% end %>
+
+    <span class="badge rounded-pill geo-badge px-3 py-2">
+        Admin workspace
+    </span>
+    </nav>
+</header>
+
+<main class="container py-5">
+    <%# Display confirmation after an event is created or updated. %>
+    <% if flash[:notice].present? %>
+    <div class="alert alert-success" role="status">
+        <%= flash[:notice] %>
+    </div>
+    <% end %>
+
+    <div class="mb-4">
+    <%= link_to "← Back to home", root_path,
+        class: "geo-accent text-decoration-none small" %>
+    </div>
+
+    <div class="mb-4">
+    <p class="geo-accent small fw-bold text-uppercase mb-2">
+        Event management
+    </p>
+
+    <h1 class="display-6 fw-bold">Manage geopolitical events</h1>
+
+    <p class="geo-muted mb-0">
+        Manage geopolitical events and the countries involved.
+    </p>
+    </div>
+
+    <div class="row g-4">
+    <%# Display the shared form for creating a new event. %>
+    <div class="col-xl-4">
+        <section class="card geo-card rounded-4">
+        <div class="card-body p-4">
+            <h2 class="h4 mb-2">Add an event</h2>
+
+            <p class="geo-muted small mb-4">
+            Enter the event details and select the countries involved.
+            </p>
+
+            <%= render "form", geopolitical_event: @geopolitical_event %>
+        </div>
+        </section>
+    </div>
+
+    <%# Display the saved events alongside the add form. %>
+    <div class="col-xl-8">
+        <section class="card geo-card rounded-4">
+        <div class="card-body p-4">
+            <div class="d-flex justify-content-between align-items-center gap-3 mb-4">
+            <div>
+                <h2 class="h4 mb-1">Geopolitical events</h2>
+
+                <p class="geo-muted small mb-0">
+                Events stored in Geo Link.
+                </p>
+            </div>
+
+            <%# Show the total number of events in the list. %>
+            <span class="badge rounded-pill geo-badge">
+                <%= pluralize(@geopolitical_events.size, "event") %>
+            </span>
+            </div>
+
+            <%# Allow the table to scroll horizontally on smaller screens. %>
+            <div class="table-responsive">
+            <table class="table geo-table align-middle mb-0">
+                <caption class="visually-hidden">
+                Geopolitical events and their associated countries.
+                </caption>
+
+                <thead>
+                <tr>
+                    <th scope="col">ID</th>
+                    <th scope="col">Title / Description</th>
+                    <th scope="col">Event type</th>
+                    <th scope="col">Started on</th>
+                    <th scope="col">Ended on / Ongoing</th>
+                    <th scope="col">Countries</th>
+                    <th scope="col" class="text-end">Actions</th>
+                </tr>
+                </thead>
+
+                <tbody>
+                <%# Create one table row for each saved event. %>
+                <% @geopolitical_events.each do |event| %>
+                    <tr>
+                    <td><%= event.id %></td>
+
+                    <th scope="row" class="py-3">
+                        <div class="fw-semibold">
+                        <%= event.title %>
+                        </div>
+
+                        <%# Shorten long descriptions to keep the table readable. %>
+                        <div class="geo-muted small fw-normal">
+                        <%= truncate(event.description, length: 140) %>
+                        </div>
+                    </th>
+
+                    <td><%= event.event_type %></td>
+
+                    <%# Format dates consistently throughout the table. %>
+                    <td class="text-nowrap">
+                        <%= event.started_on&.strftime("%d %b %Y") %>
+                    </td>
+
+                    <td class="text-nowrap">
+                        <% if event.ongoing? %>
+                        <span class="badge rounded-pill geo-badge">
+                            Ongoing
+                        </span>
+                        <% else %>
+                        <%= event.ended_on.strftime("%d %b %Y") %>
+                        <% end %>
+                    </td>
+
+                    <%# Display all countries linked through event_countries. %>
+                    <td>
+                        <% if event.countries.any? %>
+                        <%= event.countries.map(&:name).sort.join(", ") %>
+                        <% else %>
+                        <span class="geo-muted">No countries selected</span>
+                        <% end %>
+                    </td>
+
+                    <%# Open the edit page for this event. %>
+                    <td class="text-end text-nowrap">
+                        <%= link_to "Edit",
+                            edit_admin_geopolitical_event_path(event),
+                            class: "btn btn-sm btn-outline-light",
+                            aria: { label: "Edit #{event.title}" } %>
+                    </td>
+                    </tr>
+                <% end %>
+
+                <%# Show helpful text before any events have been added. %>
+                <% if @geopolitical_events.empty? %>
+                    <tr>
+                    <td colspan="7" class="text-center py-5">
+                        No events yet. Add your first event using the form.
+                    </td>
+                    </tr>
+                <% end %>
+                </tbody>
+            </table>
+            </div>
+        </div>
+        </section>
+    </div>
+    </div>
+</main>
+</div>

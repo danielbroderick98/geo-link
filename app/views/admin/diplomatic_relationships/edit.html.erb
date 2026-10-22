@@ -1,0 +1,89 @@
+<div class="geo-home min-vh-100">
+    <%# Display the Geo Link header and link back to the homepage. %>
+    <header class="border-bottom border-secondary">
+    <nav class="container py-4 d-flex justify-content-between align-items-center"
+        aria-label="Admin navigation">
+        <%= link_to root_path,
+            class: "fs-3 fw-bold text-decoration-none text-light" do %>
+        Geo<span class="geo-accent">Link</span>
+        <% end %>
+
+        <span class="badge rounded-pill geo-badge px-3 py-2">
+        Admin workspace
+        </span>
+    </nav>
+    </header>
+    <main class="container py-5">
+        <div class="mb-4">
+        <%= link_to "← Back to relationships",
+            admin_diplomatic_relationships_path,
+            class: "geo-accent text-decoration-none small" %>
+        </div>
+
+        <h1 class="display-6 fw-bold mb-4">Edit diplomatic relationship</h1>
+
+        <div class="row">
+        <div class="col-lg-6">
+            <section class="card geo-card rounded-4">
+            <div class="card-body p-4">
+                <%# Display validation errors without clearing the entered values. %>
+                <% if @diplomatic_relationship.errors.any? %>
+                <div class="alert alert-danger" role="alert">
+                    <p class="fw-semibold mb-2">Please check the following:</p>
+                    <ul class="mb-0">
+                    <% @diplomatic_relationship.errors.full_messages.each do |message| %>
+                        <li><%= message %></li>
+                    <% end %>
+                    </ul>
+                </div>
+                <% end %>
+
+                <%# Rails detects the saved record and submits to the update action. %>
+                <%= form_with model: [:admin, @diplomatic_relationship] do |form| %>
+                <div class="mb-3">
+                    <%= form.label :country_1_id, "Country 1",
+                        class: "form-label" %>
+
+                    <%# Automatically select the relationship's current country. %>
+                    <%= form.collection_select :country_1_id,
+                        @countries, :id, :name,
+                        { prompt: "Select Country 1" },
+                        { class: "form-select geo-input", required: true } %>
+                </div>
+
+                <div class="mb-3">
+                    <%= form.label :country_2_id, "Country 2",
+                        class: "form-label" %>
+
+                    <%= form.collection_select :country_2_id,
+                        @countries, :id, :name,
+                        { prompt: "Select Country 2" },
+                        { class: "form-select geo-input", required: true } %>
+                </div>
+
+                <div class="mb-4">
+                    <%= form.label :relationship_type, "Relationship type",
+                        class: "form-label" %>
+
+                    <%= form.text_field :relationship_type,
+                        class: "form-control geo-input",
+                        placeholder: "e.g. Allied, Neutral, or Hostile",
+                        required: true %>
+                </div>
+
+                <div class="d-flex flex-wrap gap-2">
+                    <%= form.submit "Save changes",
+                        class: "btn geo-button" %>
+
+                    <%# Return to the list without saving changes. %>
+                    <%= link_to "Cancel",
+                        admin_diplomatic_relationships_path,
+                        class: "btn btn-outline-light" %>
+                </div>
+                <% end %>
+            </div>
+            </section>
+        </div>
+        </div>
+    </main>
+</div>
