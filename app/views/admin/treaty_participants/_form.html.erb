@@ -1,0 +1,64 @@
+<%# Display errors, including duplicate treaty/country combinations. %>
+<% if treaty_participant.errors.any? %>
+  <div class="alert alert-danger" role="alert">
+    <p class="fw-semibold mb-2">Please check the following:</p>
+
+    <ul class="mb-0">
+      <% treaty_participant.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+    </ul>
+  </div>
+<% end %>
+
+<%# Both a treaty and a country must exist before adding participants. %>
+<% missing_options = @treaties.empty? || @countries.empty? %>
+
+<% if missing_options %>
+  <div class="alert alert-info" role="status">
+    Add at least one treaty and one country before adding participants.
+  </div>
+<% end %>
+
+<%= form_with model: [:admin, treaty_participant] do |form| %>
+  <div class="mb-3">
+    <%= form.label :treaty_id, "Treaty", class: "form-label" %>
+
+    <%# Show treaty names while submitting the selected treaty ID. %>
+    <%= form.collection_select :treaty_id,
+        @treaties,
+        :id,
+        :name,
+        { prompt: "Select a treaty" },
+        {
+          class: "form-select geo-input",
+          required: true,
+          disabled: missing_options
+        } %>
+  </div>
+
+  <div class="mb-4">
+    <%= form.label :country_id, "Country", class: "form-label" %>
+
+    <%# Show country names while submitting the selected country ID. %>
+    <%= form.collection_select :country_id,
+        @countries,
+        :id,
+        :name,
+        { prompt: "Select a country" },
+        {
+          class: "form-select geo-input",
+          required: true,
+          disabled: missing_options
+        } %>
+
+    <p class="geo-muted small mt-2 mb-0">
+      A country can only be added once to each treaty.
+    </p>
+  </div>
+
+  <%# Use the existing Geo Link button styling and Bootstrap width. %>
+  <%= form.submit "Add participant",
+      class: "btn geo-button w-100",
+      disabled: missing_options %>
+<% end %>

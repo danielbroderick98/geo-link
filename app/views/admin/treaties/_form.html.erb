@@ -1,0 +1,164 @@
+<%# Show validation errors while preserving entered values. %>
+<% if treaty.errors.any? %>
+  <div class="alert alert-danger" role="alert">
+    <p class="fw-semibold mb-2">
+      Please check the following:
+    </p>
+
+    <ul class="mb-0">
+      <% treaty.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+    </ul>
+  </div>
+<% end %>
+
+<%# Determine whether this form is adding or editing a treaty. %>
+<% editing = @editing_treaty.present? %>
+
+<%# Choose the correct submission URL and HTTP method.
+    Explicitly setting these also supports the unsaved form object
+    used while adding or removing countries during editing. %>
+<% submission_url =
+     editing ? admin_treaty_path(@editing_treaty) : admin_treaties_path %>
+<% submission_method = editing ? :patch : :post %>
+
+<%# Use a normal Rails form submission without Turbo or JavaScript. %>
+<%= form_with model: treaty,
+    scope: :treaty,
+    url: submission_url,
+    method: submission_method,
+    local: true,
+    data: { turbo: false } do |form| %>
+
+  <div class="mb-3">
+    <%= form.label :name,
+        "Treaty name",
+        class: "form-label" %>
+
+    <%= form.text_field :name,
+        class: "form-control geo-input",
+        placeholder: "Enter treaty name",
+        required: true %>
+  </div>
+
+  <div class="mb-3">
+    <%= form.label :date_signed,
+        "Date signed",
+        class: "form-label" %>
+
+    <%= form.date_field :date_signed,
+        class: "form-control geo-input" %>
+  </div>
+
+  <%# Status remains a free-text field. %>
+  <div class="mb-3">
+    <%= form.label :status,
+        class: "form-label" %>
+
+    <%= form.text_field :status,
+        class: "form-control geo-input",
+        placeholder: "e.g. Signed or In force" %>
+  </div>
+
+  <div class="mb-4">
+    <%= form.label :description,
+        class: "form-label" %>
+
+    <%= form.text_area :description,
+        class: "form-control geo-input",
+        rows: 4,
+        placeholder: "Describe the treaty" %>
+  </div>
+
+  <%# Keep country selection inside the treaty form. %>
+  <fieldset class="mb-4">
+    <legend class="h6 mb-2">
+      Countries involved
+    </legend>
+
+    <p class="geo-muted small mb-3">
+      Choose a country and click Add country.
+      Your selections are saved when you save the treaty.
+    </p>
+
+    <%# Hide already-selected countries from the dropdown. %>
+    <% selected_country_ids = treaty.country_ids %>
+    <% available_countries = @countries.reject { |country|
+         selected_country_ids.include?(country.id)
+       } %>
+
+    <%= label_tag :selected_country_id,
+        "Select a country",
+        class: "visually-hidden" %>
+
+    <div class="d-flex flex-wrap gap-2 mb-3">
+      <%= select_tag :selected_country_id,
+          options_from_collection_for_select(
+            available_countries,
+            :id,
+            :name
+          ),
+          prompt: "Select a country",
+          class: "form-select geo-input flex-grow-1 w-auto" %>
+
+      <%# Submit the form to Rails to add a country.
+          Skip browser required-field validation for this action,
+          so countries can be chosen before entering a treaty name. %>
+      <%= button_tag "Add country",
+          type: "submit",
+          name: "country_action",
+          value: "add",
+          formnovalidate: true,
+          class: "btn geo-button" %>
+    </div>
+
+    <%# Ensure country_ids is submitted even if every country
+        has been removed. Rails ignores this blank ID. %>
+    <%= hidden_field_tag "treaty[country_ids][]",
+        "",
+        id: nil %>
+
+    <p class="small mb-2">
+      Added countries
+    </p>
+
+    <% if treaty.countries.any? %>
+      <ul class="list-unstyled mb-0">
+        <% treaty.countries.sort_by(&:name).each do |country| %>
+          <li class="d-flex justify-content-between align-items-center gap-2 mb-2">
+            <span>
+              <%= country.name %>
+            </span>
+
+            <%# Preserve this selected country on the next submission. %>
+            <%= hidden_field_tag "treaty[country_ids][]",
+                country.id,
+                id: nil %>
+
+            <%# Tell Rails which selected country to remove.
+                This does not delete the country itself. %>
+            <%= button_tag "Remove",
+                type: "submit",
+                name: "country_action",
+                value: "remove:#{country.id}",
+                formnovalidate: true,
+                class: "btn btn-sm btn-outline-light",
+                aria: { label: "Remove #{country.name}" } %>
+          </li>
+        <% end %>
+      </ul>
+    <% else %>
+      <p class="geo-muted small mb-0">
+        No countries added yet.
+      </p>
+    <% end %>
+  </fieldset>
+
+  <%# Save the treaty details and country selections.
+      This button uses normal browser required-field validation. %>
+  <%= form.submit(
+        editing ? "Save changes" : "Add treaty",
+        class: "btn geo-button w-100"
+      ) %>
+<% end %>

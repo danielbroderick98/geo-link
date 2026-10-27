@@ -1,11 +1,15 @@
 Rails.application.routes.draw do
   namespace :admin do
-    # Display countries and accept submissions for new countries.
-    resources :countries, only: [ :index, :create, :edit, :update ]
-    # Routes for listing, creating, and editing geopolitical events.
+    # Display countries and accept submissions for new countries
+    resources :countries, only: [ :index, :create, :edit, :update, :destroy]
+    # Routes for listing, creating, and editing geopolitical events
     resources :geopolitical_events, only: [:index, :create, :edit, :update]
-    # Routes for listing, adding, editing, and deleting relationships.
+    # Routes for listing, adding, editing, and deleting relationships
     resources :diplomatic_relationships, only: [:index, :create, :edit, :update, :destroy]
+    # Routes to list treaties, show the new treaty form, and create a new treaty
+    resources :treaties, only: [:index, :new, :create, :edit, :update, :destroy]
+    # Display participants and save new participant records.
+    resources :treaty_participants, only: [:index, :create]
   end
   root "home#index"
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html

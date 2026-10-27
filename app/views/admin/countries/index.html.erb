@@ -1,9 +1,12 @@
+<%# Apply the existing Geo Link background and full-height layout. %>
 <div class="geo-home min-vh-100">
   <header class="border-bottom border-secondary">
     <nav class="container py-4 d-flex justify-content-between align-items-center"
          aria-label="Admin navigation">
-      <%# Link the logo to the homepage. %>
-      <%= link_to root_path, class: "fs-3 fw-bold text-decoration-none text-light" do %>
+
+      <%# Link the Geo Link logo to the homepage. %>
+      <%= link_to root_path,
+          class: "fs-3 fw-bold text-decoration-none text-light" do %>
         Geo<span class="geo-accent">Link</span>
       <% end %>
 
@@ -14,10 +17,17 @@
   </header>
 
   <main class="container py-5">
-    <%# Show confirmation after successfully saving a country. %>
+    <%# Show confirmation after successfully saving or deleting a country. %>
     <% if flash[:notice].present? %>
       <div class="alert alert-success" role="status">
         <%= flash[:notice] %>
+      </div>
+    <% end %>
+
+    <%# Explain when a country cannot be deleted. %>
+    <% if flash[:alert].present? %>
+      <div class="alert alert-danger" role="alert">
+        <%= flash[:alert] %>
       </div>
     <% end %>
 
@@ -26,12 +36,15 @@
           class: "geo-accent text-decoration-none small" %>
     </div>
 
+    <%# Page heading and administration badge. %>
     <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
       <div>
         <p class="geo-accent small fw-bold text-uppercase mb-2">
           Country management
         </p>
+
         <h1 class="display-6 fw-bold">Manage countries</h1>
+
         <p class="geo-muted mb-0">
           Manage country profiles and their availability on Geo Link.
         </p>
@@ -42,15 +55,18 @@
       </span>
     </div>
 
+    <%# Bootstrap stacks the cards on smaller screens. %>
     <div class="row g-4">
       <div class="col-xl-4">
         <section class="card geo-card rounded-4">
           <div class="card-body p-4">
             <h2 class="h4 mb-2">Add a country</h2>
+
             <p class="geo-muted small mb-4">
               Enter the country's details below.
             </p>
 
+            <%# Reuse the existing country form partial. %>
             <%= render "form", country: @country %>
           </div>
         </section>
@@ -62,47 +78,69 @@
             <div class="d-flex justify-content-between align-items-center gap-3 mb-4">
               <div>
                 <h2 class="h4 mb-1">Countries</h2>
+
                 <p class="geo-muted small mb-0">
                   Countries stored in Geo Link.
                 </p>
               </div>
 
+              <%# The count reflects the current search and status filters. %>
               <span class="badge rounded-pill geo-badge">
-                <%# Display the number of saved countries. %>
                 <%= pluralize(@countries.size, "country") %>
               </span>
             </div>
 
-            <div class="row g-3 mb-4">
-              <div class="col-md-8">
-                <label for="country-search" class="visually-hidden">
-                  Search countries
-                </label>
-                <input id="country-search"
-                       type="search"
-                       class="form-control geo-input"
-                       placeholder="Search countries — coming soon"
-                       disabled>
+            <%# Search and filter using a GET request, keeping filters in the URL. %>
+            <%= form_with url: admin_countries_path,
+                method: :get,
+                class: "mb-4" do |form| %>
+
+              <div class="row g-3">
+                <div class="col-md-8">
+                  <%= form.label :query, "Search countries",
+                      class: "visually-hidden" %>
+
+                  <%# Preserve the entered search text after submission. %>
+                  <%= form.search_field :query,
+                      value: @query,
+                      class: "form-control geo-input",
+                      placeholder: "Search by country or region" %>
+                </div>
+
+                <div class="col-md-4">
+                  <%= form.label :status, "Filter by status",
+                      class: "visually-hidden" %>
+
+                  <%# Preserve the selected status after submission. %>
+                  <%= form.select :status,
+                      options_for_select(
+                        [
+                          ["All statuses", ""],
+                          ["Active", "active"],
+                          ["Inactive", "inactive"]
+                        ],
+                        @status
+                      ),
+                      {},
+                      class: "form-select geo-input" %>
+                </div>
               </div>
 
-              <div class="col-md-4">
-                <label for="country-status-filter" class="visually-hidden">
-                  Filter by status
-                </label>
-                <select id="country-status-filter"
-                        class="form-select geo-input"
-                        disabled>
-                  <option>All statuses</option>
-                  <option>Active</option>
-                  <option>Inactive</option>
-                </select>
-              </div>
-            </div>
+              <div class="d-flex gap-2 mt-3">
+                <%# Apply the search text and status filter together. %>
+                <%= form.submit "Search", class: "btn geo-button" %>
 
+                <%# Return to the full list without any filters. %>
+                <%= link_to "Reset", admin_countries_path,
+                    class: "btn btn-outline-light" %>
+              </div>
+            <% end %>
+
+            <%# Allow horizontal scrolling on smaller screens. %>
             <div class="table-responsive">
               <table class="table geo-table align-middle mb-0">
                 <caption class="visually-hidden">
-                  Countries stored in Geo Link.
+                  Countries matching the current search and status filters.
                 </caption>
 
                 <thead>
@@ -117,11 +155,14 @@
                 </thead>
 
                 <tbody>
-                  <%# Display a row for each country loaded from the database. %>
+                  <%# Display each country returned by the controller. %>
                   <% @countries.each do |country| %>
                     <tr>
                       <th scope="row" class="py-3">
-                        <div class="fw-semibold"><%= country.name %></div>
+                        <div class="fw-semibold">
+                          <%= country.name %>
+                        </div>
+
                         <div class="geo-muted small fw-normal">
                           <%= country.region %>
                         </div>
@@ -129,14 +170,14 @@
 
                       <td><%= country.capital %></td>
 
-                      <%# Add thousands separators to the population. %>
+                      <%# Format population with thousands separators. %>
                       <td class="text-end">
                         <%= number_with_delimiter(country.population) %>
                       </td>
 
                       <td><%= country.political_system %></td>
 
-                      <%# Show the Boolean status as an Active or Inactive badge. %>
+                      <%# Display the Boolean active field as a status badge. %>
                       <td>
                         <span class="badge rounded-pill <%= country.active? ? 'geo-badge' : 'geo-badge-inactive' %>">
                           <%= country.active? ? "Active" : "Inactive" %>
@@ -144,25 +185,33 @@
                       </td>
 
                       <td class="text-end text-nowrap">
-                        <%= link_to "Edit", edit_admin_country_path(country),
+                        <%# Open the existing country edit page. %>
+                        <%= link_to "Edit",
+                            edit_admin_country_path(country),
                             class: "btn btn-sm btn-outline-light",
                             aria: { label: "Edit #{country.name}" } %>
 
-                        <button type="button"
-                                class="btn btn-sm btn-outline-danger ms-1"
-                                aria-label="Delete <%= country.name %>"
-                                disabled>
-                          Delete
-                        </button>
+                        <%# Confirm deletion using Turbo, then submit a DELETE request. %>
+                        <%= button_to "Delete",
+                            admin_country_path(country),
+                            method: :delete,
+                            form: {
+                              class: "d-inline-block ms-1",
+                              data: {
+                                turbo_confirm: "Delete #{country.name}? This will also remove its treaty participant links."
+                              }
+                            },
+                            class: "btn btn-sm btn-outline-danger",
+                            aria: { label: "Delete #{country.name}" } %>
                       </td>
                     </tr>
                   <% end %>
 
-                  <%# Show an empty state before the first country is added. %>
+                  <%# Show a helpful message when there are no results. %>
                   <% if @countries.empty? %>
                     <tr>
                       <td colspan="6" class="text-center py-5">
-                        No countries yet. Add your first country using the form.
+                        No countries found. Try another search or reset the filters.
                       </td>
                     </tr>
                   <% end %>

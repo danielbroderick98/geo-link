@@ -1,0 +1,51 @@
+<%# Match the styling of the treaty management page. %>
+<div class="geo-home min-vh-100">
+  <header class="border-bottom border-secondary">
+    <nav
+      class="container py-4 d-flex justify-content-between align-items-center"
+      aria-label="Admin navigation"
+    >
+      <%= link_to root_path,
+          class: "fs-3 fw-bold text-decoration-none text-light" do %>
+        Geo<span class="geo-accent">Link</span>
+      <% end %>
+
+      <span class="badge rounded-pill geo-badge px-3 py-2">
+        Admin workspace
+      </span>
+    </nav>
+  </header>
+
+  <main class="container py-5">
+    <%# Return to the list without saving the form. %>
+    <div class="mb-4">
+      <%= link_to "← Back to treaties",
+          admin_treaties_path,
+          class: "geo-accent text-decoration-none small" %>
+    </div>
+
+    <div class="row justify-content-center">
+      <div class="col-lg-7 col-xl-6">
+        <section class="card geo-card rounded-4">
+          <div class="card-body p-4">
+            <h1 class="h4 mb-2">
+              Edit treaty
+            </h1>
+
+            <p class="geo-muted small mb-4">
+              Update the treaty's details and participating countries.
+            </p>
+
+            <%# Reuse the same form used when adding a treaty. %>
+            <%= render "form", treaty: @treaty %>
+
+            <%# Discard unsaved edits by returning to the list. %>
+            <%= link_to "Cancel",
+                admin_treaties_path,
+                class: "btn btn-outline-light w-100 mt-3" %>
+          </div>
+        </section>
+      </div>
+    </div>
+  </main>
+</div>

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_22_062537) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_26_092304) do
   create_table "countries", force: :cascade do |t|
     t.string "name", null: false
     t.string "region", null: false
@@ -54,6 +54,24 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_22_062537) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "treaties", force: :cascade do |t|
+    t.string "name"
+    t.date "date_signed"
+    t.string "status"
+    t.text "description"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "treaty_participants", force: :cascade do |t|
+    t.integer "treaty_id", null: false
+    t.integer "country_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["country_id"], name: "index_treaty_participants_on_country_id"
+    t.index ["treaty_id"], name: "index_treaty_participants_on_treaty_id"
+  end
+
   create_table "users", force: :cascade do |t|
     t.string "name"
     t.string "email"
@@ -63,8 +81,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_22_062537) do
     t.datetime "updated_at", null: false
   end
 
-  add_foreign_key "diplomatic_relationships", "country_1s"
-  add_foreign_key "diplomatic_relationships", "country_2s"
+  add_foreign_key "diplomatic_relationships", "countries", column: "country_1_id"
+  add_foreign_key "diplomatic_relationships", "countries", column: "country_2_id"
   add_foreign_key "event_countries", "countries"
   add_foreign_key "event_countries", "geopolitical_events"
+  add_foreign_key "treaty_participants", "countries"
+  add_foreign_key "treaty_participants", "treaties"
 end

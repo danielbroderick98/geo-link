@@ -1,0 +1,9 @@
+<%# Page heading. %>
+<h1>Add treaty</h1>
+
+<%# Display the shared form using the controller's treaty object. %>
+<%= render "form", treaty: @treaty %>
+
+<%# Return to the list without submitting the form. %>
+<%= link_to "Back to treaties", admin_treaties_path,
+class: "btn btn-link mt-3" %>

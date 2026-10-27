@@ -1,0 +1,189 @@
+<%# Use the existing Geo Link page background. %>
+<div class="geo-home min-vh-100">
+  <header class="border-bottom border-secondary">
+    <nav
+      class="container py-4 d-flex justify-content-between align-items-center"
+      aria-label="Admin navigation"
+    >
+      <%# Geo Link branding links back to the homepage. %>
+      <%= link_to root_path,
+          class: "fs-3 fw-bold text-decoration-none text-light" do %>
+        Geo<span class="geo-accent">Link</span>
+      <% end %>
+
+      <span class="badge rounded-pill geo-badge px-3 py-2">
+        Admin workspace
+      </span>
+    </nav>
+  </header>
+
+  <main class="container py-5">
+    <%# Show confirmation after creating, updating, or deleting. %>
+    <% if flash[:notice].present? %>
+      <div class="alert alert-success" role="status">
+        <%= flash[:notice] %>
+      </div>
+    <% end %>
+
+    <%# Show an error if a treaty could not be deleted. %>
+    <% if flash[:alert].present? %>
+      <div class="alert alert-danger" role="alert">
+        <%= flash[:alert] %>
+      </div>
+    <% end %>
+
+    <div class="mb-4">
+      <%= link_to "← Back to home",
+          root_path,
+          class: "geo-accent text-decoration-none small" %>
+    </div>
+
+    <%# Page heading and description. %>
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+      <div>
+        <p class="geo-accent small fw-bold text-uppercase mb-2">
+          Treaty management
+        </p>
+
+        <h1 class="display-6 fw-bold">
+          Manage treaties
+        </h1>
+
+        <p class="geo-muted mb-0">
+          Manage treaties, their details, and participating countries on Geo Link.
+        </p>
+      </div>
+
+      <span class="badge rounded-pill geo-badge px-3 py-2">
+        Treaty administration
+      </span>
+    </div>
+
+    <%# Stack the cards on smaller screens and place them
+        beside each other on wider screens. %>
+    <div class="row g-4">
+      <div class="col-xl-4">
+        <section class="card geo-card rounded-4">
+          <div class="card-body p-4">
+            <h2 class="h4 mb-2">
+              Add a treaty
+            </h2>
+
+            <p class="geo-muted small mb-4">
+              Enter the treaty's details below.
+            </p>
+
+            <%# Render the shared form, including its country picker. %>
+            <%= render "form", treaty: @treaty %>
+          </div>
+        </section>
+      </div>
+
+      <div class="col-xl-8">
+        <section class="card geo-card rounded-4">
+          <div class="card-body p-4">
+            <div class="d-flex justify-content-between align-items-center gap-3 mb-4">
+              <div>
+                <h2 class="h4 mb-1">
+                  Treaties
+                </h2>
+
+                <p class="geo-muted small mb-0">
+                  Treaties stored in Geo Link.
+                </p>
+              </div>
+
+              <%# Display the number of saved treaties. %>
+              <span class="badge rounded-pill geo-badge">
+                <%= pluralize(@treaties.size, "treaty") %>
+              </span>
+            </div>
+
+            <%# Allow the table to scroll on smaller screens. %>
+            <div class="table-responsive">
+              <table class="table geo-table align-middle mb-0">
+                <caption class="visually-hidden">
+                  Treaties stored in Geo Link.
+                </caption>
+
+                <thead>
+                  <tr>
+                    <th scope="col">ID</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">Date signed</th>
+                    <th scope="col">Status</th>
+                    <th scope="col">Description</th>
+                    <th scope="col">Actions</th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  <%# Display one row for each saved treaty. %>
+                  <% @treaties.each do |treaty| %>
+                    <tr>
+                      <td>
+                        <%= treaty.id %>
+                      </td>
+
+                      <th scope="row" class="py-3 fw-semibold">
+                        <%= treaty.name %>
+                      </th>
+
+                      <td class="text-nowrap">
+                        <%= treaty.date_signed&.strftime("%d %b %Y") || "—" %>
+                      </td>
+
+                      <td>
+                        <% if treaty.status.present? %>
+                          <span class="badge rounded-pill geo-badge">
+                            <%= treaty.status %>
+                          </span>
+                        <% else %>
+                          <span class="geo-muted">—</span>
+                        <% end %>
+                      </td>
+
+                      <td class="text-break">
+                        <%= treaty.description %>
+                      </td>
+
+                      <td>
+                        <div class="d-flex align-items-center gap-2">
+                          <%# Open the edit page for this treaty. %>
+                          <%= link_to "Edit",
+                              edit_admin_treaty_path(treaty),
+                              class: "btn btn-sm geo-button",
+                              data: { turbo: false } %>
+
+                          <%# Submit a Rails delete form.
+                              No JavaScript is required. %>
+                          <%= button_to "Delete",
+                              admin_treaty_path(treaty),
+                              method: :delete,
+                              class: "btn btn-sm btn-outline-danger",
+                              form: {
+                                class: "m-0",
+                                data: { turbo: false }
+                              } %>
+                        </div>
+                      </td>
+                    </tr>
+                  <% end %>
+
+                  <%# Show an empty state when there are no treaties. %>
+                  <% if @treaties.empty? %>
+                    <tr>
+                      <td colspan="6" class="text-center py-5">
+                        No treaties yet. Add your first treaty using the form.
+                      </td>
+                    </tr>
+                  <% end %>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+  </main>
+</div>

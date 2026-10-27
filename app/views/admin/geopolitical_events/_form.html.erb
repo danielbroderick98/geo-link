@@ -1,90 +1,169 @@
-<%# Display validation errors while preserving the entered details. %>
+<%# Display validation errors while preserving entered details. %>
 <% if geopolitical_event.errors.any? %>
-<div class="alert alert-danger" role="alert">
+  <div class="alert alert-danger" role="alert">
     <p class="fw-semibold mb-2">Please check the following:</p>
 
     <ul class="mb-0">
-    <% geopolitical_event.errors.full_messages.each do |message| %>
+      <% geopolitical_event.errors.full_messages.each do |message| %>
         <li><%= message %></li>
-    <% end %>
+      <% end %>
     </ul>
-</div>
+  </div>
 <% end %>
 
-<%# Use the same form for creating and updating events. %>
-<%= form_with model: [:admin, geopolitical_event] do |form| %>
-<div class="mb-3">
-    <%= form.label :title, class: "form-label" %>
-    <%= form.text_field :title,
-        class: "form-control geo-input",
-        placeholder: "Enter the event title",
-        required: true %>
-</div>
+<%# Use unsaved country choices when redisplaying the form.
+    Otherwise, use the event's existing country associations. %>
+<%
+  selected_ids = (
+    @selected_country_ids || geopolitical_event.country_ids
+  ).map(&:to_s)
 
-<div class="mb-3">
-    <%= form.label :event_type, "Event type", class: "form-label" %>
-    <%= form.text_field :event_type,
-        class: "form-control geo-input",
-        placeholder: "e.g. Election, conflict, or treaty",
-        required: true %>
-</div>
+  countries = Country.order(:name).to_a
 
-<div class="mb-3">
-    <%= form.label :started_on, "Started on", class: "form-label" %>
-    <%= form.date_field :started_on,
-        class: "form-control geo-input",
-        required: true %>
-</div>
+  selected_countries = countries.select do |country|
+    selected_ids.include?(country.id.to_s)
+  end
 
-<div class="mb-3">
-    <%= form.label :ended_on, "Ended on", class: "form-label" %>
-    <%= form.date_field :ended_on,
-        class: "form-control geo-input",
-        aria: { describedby: "event-end-date-help" } %>
+  available_countries = countries.reject do |country|
+    selected_ids.include?(country.id.to_s)
+  end
+%>
 
-    <p id="event-end-date-help" class="geo-muted small mt-2 mb-0">
-    Leave blank if the event is ongoing.
-    </p>
-</div>
+<%# Disable Turbo for this form so each action uses a normal page reload. %>
+<%= form_with model: [:admin, geopolitical_event],
+    data: { turbo: false } do |form| %>
 
-<div class="mb-3">
-    <%= form.label :description, class: "form-label" %>
-    <%= form.text_area :description,
-        class: "form-control geo-input",
-        rows: 5,
-        placeholder: "Describe the event",
-        required: true %>
-</div>
+  <%# Put the save button first in the form's DOM so pressing Enter
+      does not accidentally activate an Add or Remove button. %>
+  <div class="d-flex flex-column">
+    <div class="order-2">
+      <%= form.submit(
+          geopolitical_event.persisted? ? "Save changes" : "Add event",
+          class: "btn geo-button w-100"
+      ) %>
+    </div>
 
-<%# Each checked country creates a link in event_countries. %>
-<fieldset class="mb-4">
-    <legend class="form-label fs-6">Countries involved</legend>
+    <div class="order-1">
+      <div class="mb-3">
+        <%= form.label :title, class: "form-label" %>
+        <%= form.text_field :title,
+            class: "form-control geo-input",
+            placeholder: "Enter the event title",
+            required: true %>
+      </div>
 
-    <p class="geo-muted small">
-    Select all countries involved in this event.
-    </p>
+      <div class="mb-3">
+        <%= form.label :event_type, "Event type", class: "form-label" %>
+        <%= form.text_field :event_type,
+            class: "form-control geo-input",
+            placeholder: "e.g. Election, conflict, or treaty",
+            required: true %>
+      </div>
 
-    <%# Include every country so existing selections remain editable. %>
-    <% countries = Country.order(:name) %>
+      <div class="mb-3">
+        <%= form.label :started_on, "Started on", class: "form-label" %>
+        <%= form.date_field :started_on,
+            class: "form-control geo-input",
+            required: true %>
+      </div>
 
-    <% if countries.any? %>
-    <%# The hidden field allows all country selections to be cleared. %>
-    <%= form.collection_check_boxes :country_ids,
-        countries, :id, :name do |country_field| %>
-        <div class="form-check mb-2">
-        <%= country_field.check_box class: "form-check-input" %>
-        <%= country_field.label class: "form-check-label" %>
+      <div class="mb-3">
+        <%= form.label :ended_on, "Ended on", class: "form-label" %>
+        <%= form.date_field :ended_on,
+            class: "form-control geo-input",
+            aria: { describedby: "event-end-date-help" } %>
+
+        <p id="event-end-date-help" class="geo-muted small mt-2 mb-0">
+          Leave blank if the event is ongoing.
+        </p>
+      </div>
+
+      <div class="mb-3">
+        <%= form.label :description, class: "form-label" %>
+        <%= form.text_area :description,
+            class: "form-control geo-input",
+            rows: 5,
+            placeholder: "Describe the event",
+            required: true %>
+      </div>
+
+      <fieldset class="mb-4">
+        <legend class="form-label fs-6">Countries involved</legend>
+
+        <p class="geo-muted small">
+          Choose a country and click Add country.
+          Your selections are saved when you save the event.
+        </p>
+
+        <%# Always submit the country_ids array, even when it is empty. %>
+        <%= hidden_field_tag "#{form.object_name}[country_ids][]",
+            "",
+            id: nil %>
+
+        <% if available_countries.any? %>
+          <%= label_tag :selected_country_id, "Select a country",
+              class: "visually-hidden" %>
+
+          <div class="d-flex flex-wrap gap-2">
+            <%# Only offer countries that have not already been added. %>
+            <%= select_tag :selected_country_id,
+                options_from_collection_for_select(
+                  available_countries, :id, :name
+                ),
+                include_blank: "Select a country",
+                class: "form-select geo-input flex-grow-1",
+                style: "flex-basis: 12rem;" %>
+
+            <%# Skip required-field checks while updating the selection.
+                This button does not save the event. %>
+            <%= button_tag "Add country",
+                type: "submit",
+                name: "country_action",
+                value: "add",
+                formnovalidate: true,
+                class: "btn geo-button" %>
+          </div>
+        <% elsif countries.empty? %>
+          <p class="geo-muted small">
+            Add countries in country management to make them available here.
+          </p>
+        <% else %>
+          <p class="geo-muted small">All countries have been added.</p>
+        <% end %>
+
+        <%# Show the current selection below the dropdown. %>
+        <div class="mt-3">
+          <p class="form-label small mb-2">Added countries</p>
+
+          <% if selected_countries.any? %>
+            <ul class="list-unstyled d-flex flex-wrap gap-2 mb-0">
+              <% selected_countries.each do |country| %>
+                <li class="badge rounded-pill geo-badge d-inline-flex align-items-center gap-2 px-3 py-2">
+                  <span><%= country.name %></span>
+
+                  <%# Preserve this selection through each page reload. %>
+                  <%= hidden_field_tag(
+                      "#{form.object_name}[country_ids][]",
+                      country.id,
+                      id: nil
+                  ) %>
+
+                  <%# Remove the selection without saving the event. %>
+                  <%= button_tag "Remove",
+                      type: "submit",
+                      name: "remove_country",
+                      value: country.id,
+                      formnovalidate: true,
+                      class: "btn btn-sm p-0 border-0 text-reset text-decoration-underline",
+                      aria: { label: "Remove #{country.name}" } %>
+                </li>
+              <% end %>
+            </ul>
+          <% else %>
+            <p class="geo-muted small mb-0">No countries added yet.</p>
+          <% end %>
         </div>
-    <% end %>
-    <% else %>
-    <p class="geo-muted small mb-0">
-        Add countries in country management to make them available here.
-    </p>
-    <% end %>
-</fieldset>
-
-<%= form.submit(
-        geopolitical_event.persisted? ? "Save changes" : "Add event",
-        class: "btn geo-button w-100"
-    ) %>
+      </fieldset>
+    </div>
+  </div>
 <% end %>
