@@ -11,6 +11,13 @@ Rails.application.routes.draw do
     # Display participants and save new participant records.
     resources :treaty_participants, only: [:index, :create]
   end
+
+  namespace :user do
+    # Provides only a country list and individual country pages.
+    # No routes for creating, editing, or deleting countries.
+    resources :countries, only: [:index, :show]
+  end
+
   root "home#index"
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 

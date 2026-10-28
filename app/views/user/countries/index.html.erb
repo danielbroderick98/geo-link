@@ -1,0 +1,249 @@
+<%# Use the existing Geo Link background and styling. %>
+<div class="geo-home min-vh-100">
+  <header class="border-bottom border-secondary">
+    <nav
+      class="container py-4 d-flex flex-wrap justify-content-between align-items-center gap-3"
+      aria-label="Main navigation"
+    >
+      <%# Return to the homepage through the brand link. %>
+      <%= link_to root_path,
+          class: "fs-3 fw-bold text-decoration-none text-light" do %>
+        Geo<span class="geo-accent">Link</span>
+      <% end %>
+
+      <%= link_to "Countries",
+          user_countries_path,
+          class: "geo-accent text-decoration-none",
+          aria: { current: "page" } %>
+    </nav>
+  </header>
+
+  <main class="container py-5">
+    <div class="mb-4">
+      <%= link_to "← Back to home",
+          root_path,
+          class: "geo-accent text-decoration-none small" %>
+    </div>
+
+    <%# Introduce the country directory. %>
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+      <div>
+        <p class="geo-accent small fw-bold text-uppercase mb-2">
+          Explore Geo Link
+        </p>
+
+        <h1 class="display-6 fw-bold">
+          Countries
+        </h1>
+
+        <p class="geo-muted mb-0">
+          Explore countries and view their details and status.
+        </p>
+      </div>
+
+      <%# Show the number of countries matching the current filters. %>
+      <span class="badge rounded-pill geo-badge px-3 py-2">
+        <%= pluralize(@countries.size, "country") %>
+      </span>
+    </div>
+
+    <section
+      class="card geo-card rounded-4 mb-4"
+      aria-labelledby="country-search-heading"
+    >
+      <div class="card-body p-4">
+        <h2 id="country-search-heading" class="h5 mb-3">
+          Search and filter countries
+        </h2>
+
+        <%# Submit both controls together using a normal GET request.
+            No JavaScript is required. %>
+        <%= form_with url: user_countries_path,
+            method: :get,
+            local: true,
+            data: { turbo: false } do |form| %>
+
+          <div class="row g-3 align-items-end">
+            <div class="col-md-6">
+              <%= form.label :query,
+                  "Country name",
+                  class: "form-label" %>
+
+              <%# Preserve the submitted search text. %>
+              <%= form.search_field :query,
+                  value: @query,
+                  placeholder: "e.g. Ireland",
+                  class: "form-control geo-input" %>
+            </div>
+
+            <div class="col-md-3">
+              <%= form.label :status,
+                  "Country status",
+                  class: "form-label" %>
+
+              <%# Preserve the selected status after submitting. %>
+              <%= form.select :status,
+                  options_for_select(
+                    [
+                      ["All countries", ""],
+                      ["Active", "active"],
+                      ["Inactive", "inactive"]
+                    ],
+                    @status
+                  ),
+                  {},
+                  class: "form-select geo-input" %>
+            </div>
+
+            <div class="col-md-3">
+              <%= form.submit "Search",
+                  class: "btn geo-button w-100" %>
+            </div>
+          </div>
+
+          <%# Return to the directory without search or filter parameters. %>
+          <% if @query.present? || @status.present? %>
+            <div class="mt-3">
+              <%= link_to "Clear search and filters",
+                  user_countries_path,
+                  class: "btn btn-outline-light btn-sm" %>
+            </div>
+          <% end %>
+        <% end %>
+      </div>
+    </section>
+
+    <section
+      class="card geo-card rounded-4"
+      aria-labelledby="country-directory-heading"
+    >
+      <div class="card-body p-4">
+        <h2 id="country-directory-heading" class="h4 mb-2">
+          Country directory
+        </h2>
+
+        <%# Describe the filters currently applied. %>
+        <div class="geo-muted small mb-4">
+          <% if @query.present? %>
+            <p class="mb-1">
+              Search results for “<%= @query %>”.
+            </p>
+          <% end %>
+
+          <p class="mb-0">
+            <% case @status %>
+            <% when "active" %>
+              Showing active countries.
+            <% when "inactive" %>
+              Showing inactive countries.
+            <% else %>
+              Showing active and inactive countries.
+            <% end %>
+          </p>
+        </div>
+
+        <% if @countries.any? %>
+          <%# Allow horizontal scrolling on smaller screens. %>
+          <div class="table-responsive">
+            <table class="table geo-table align-middle mb-0">
+              <caption class="visually-hidden">
+                Countries matching the selected search and status filters.
+              </caption>
+
+              <thead>
+                <tr>
+                  <th scope="col">Country</th>
+                  <th scope="col">Region</th>
+                  <th scope="col">Capital</th>
+                  <th scope="col">Population</th>
+                  <th scope="col">Status</th>
+                  <th scope="col">Details</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                <%# Display one read-only row for each matching country. %>
+                <% @countries.each do |country| %>
+                  <tr>
+                    <th scope="row" class="py-3 fw-semibold">
+                      <%= link_to country.name,
+                          user_country_path(country),
+                          class: "geo-accent text-decoration-none" %>
+                    </th>
+
+                    <td>
+                      <%= country.region.presence || "Not available" %>
+                    </td>
+
+                    <td>
+                      <%= country.capital.presence || "Not available" %>
+                    </td>
+
+                    <td class="text-nowrap">
+                      <%# Format population with separators. %>
+                      <% if country.population.present? %>
+                        <%= number_with_delimiter(country.population) %>
+                      <% else %>
+                        <span class="geo-muted">
+                          Not available
+                        </span>
+                      <% end %>
+                    </td>
+
+                    <td class="text-nowrap">
+                      <%# Display the status saved through the admin form. %>
+                      <% if country.active? %>
+                        <span class="badge rounded-pill geo-badge">
+                          Active
+                        </span>
+                      <% else %>
+                        <span class="badge rounded-pill bg-secondary text-white">
+                          Inactive
+                        </span>
+                      <% end %>
+                    </td>
+
+                    <td class="text-nowrap">
+                      <%= link_to "View details",
+                          user_country_path(country),
+                          class: "btn btn-sm geo-button",
+                          aria: {
+                            label: "View details for #{country.name}"
+                          } %>
+                    </td>
+                  </tr>
+                <% end %>
+              </tbody>
+            </table>
+          </div>
+        <% else %>
+          <div class="text-center py-5">
+            <% if @query.present? || @status.present? %>
+              <%# A search or status filter returned no matches. %>
+              <h3 class="h5">
+                No matching countries
+              </h3>
+
+              <p class="geo-muted mb-3">
+                Try another country name or choose a different status.
+              </p>
+
+              <%= link_to "Show all countries",
+                  user_countries_path,
+                  class: "btn geo-button" %>
+            <% else %>
+              <%# No countries have been added to the directory yet. %>
+              <h3 class="h5">
+                No countries available yet
+              </h3>
+
+              <p class="geo-muted mb-0">
+                Country information will appear here once it has been added.
+              </p>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+    </section>
+  </main>
+</div>
