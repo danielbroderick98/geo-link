@@ -1,5 +1,5 @@
 # Use the same parent controller as your other admin controllers.
-class Admin::TreatyParticipantsController < ApplicationController
+class Admin::TreatyParticipantsController < Admin::BaseController
   def index
     # Prepare an empty record for the form.
     @treaty_participant = TreatyParticipant.new

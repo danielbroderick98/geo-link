@@ -1,0 +1,33 @@
+<% content_for :title, "Admin sign in | Geo Link" %>
+<div class="geo-home min-vh-100">
+  <main class="container py-5">
+    <%= link_to "Geo Link", root_path, class: "geo-accent fs-3 text-decoration-none" %>
+    <div class="row justify-content-center mt-5">
+      <div class="col-md-7 col-lg-5">
+        <section class="card geo-card rounded-4">
+          <div class="card-body p-4">
+            <h1 class="h3 mb-3">Admin sign in</h1>
+            <p class="geo-muted">Sign in to manage Geo Link records.</p>
+            <% if flash[:alert].present? %>
+              <div class="alert alert-danger" role="alert"><%= flash[:alert] %></div>
+            <% end %>
+            <%# Use a regular Rails submission; never return the password to the page. %>
+            <%= form_with url: admin_login_path, data: { turbo: false } do |form| %>
+              <div class="mb-3">
+                <%= form.label :email, "Email address", class: "form-label" %>
+                <%= form.email_field :email, value: params[:email], required: true,
+                    autocomplete: "username", class: "form-control geo-input" %>
+              </div>
+              <div class="mb-4">
+                <%= form.label :password, class: "form-label" %>
+                <%= form.password_field :password, required: true,
+                    autocomplete: "current-password", class: "form-control geo-input" %>
+              </div>
+              <%= form.submit "Sign in", class: "btn geo-button w-100" %>
+            <% end %>
+          </div>
+        </section>
+      </div>
+    </div>
+  </main>
+</div>

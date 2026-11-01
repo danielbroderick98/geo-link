@@ -1,8 +1,8 @@
 module Admin
-    class DiplomaticRelationshipsController < ApplicationController
+    class DiplomaticRelationshipsController < Admin::BaseController
         # Find the saved relationship before editing, updating, or deleting it.
         before_action :set_diplomatic_relationship,
-            only: [:edit, :update, :destroy]
+            only: [ :edit, :update, :destroy ]
 
         # Display all relationships and an empty form for adding a new one.
         def index

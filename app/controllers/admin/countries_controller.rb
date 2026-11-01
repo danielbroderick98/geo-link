@@ -1,4 +1,4 @@
-class Admin::CountriesController < ApplicationController
+class Admin::CountriesController < Admin::BaseController
   def index
     # Prepare an empty country for the form beside the table.
     @country = Country.new

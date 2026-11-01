@@ -33,6 +33,7 @@
           Explore the project &rarr;
         </a>
 
+        <% if current_admin %>
         <%# Open the admin pages for managing countries and events. %>
         <div class="d-flex flex-wrap gap-3 mt-3">
           <%= link_to "Manage countries",
@@ -54,6 +55,7 @@
         </div>
       </div>
 
+        <% end %>
       <%# Open the read-only country directory in the user area. %>
       <%= link_to "Explore countries",
           user_countries_path,

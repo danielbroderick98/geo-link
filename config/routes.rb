@@ -1,27 +1,32 @@
 Rails.application.routes.draw do
+  # Only existing administrator accounts can sign in; no public admin registration.
+  get "admin/login", to: "admin/sessions#new", as: :admin_login
+  post "admin/login", to: "admin/sessions#create"
+  delete "admin/logout", to: "admin/sessions#destroy", as: :admin_logout
+
   namespace :admin do
     # Display countries and accept submissions for new countries
-    resources :countries, only: [ :index, :create, :edit, :update, :destroy]
+    resources :countries, only: [ :index, :create, :edit, :update, :destroy ]
     # Routes for listing, creating, and editing geopolitical events
-    resources :geopolitical_events, only: [:index, :create, :edit, :update]
+    resources :geopolitical_events, only: [ :index, :create, :edit, :update ]
     # Routes for listing, adding, editing, and deleting relationships
-    resources :diplomatic_relationships, only: [:index, :create, :edit, :update, :destroy]
+    resources :diplomatic_relationships, only: [ :index, :create, :edit, :update, :destroy ]
     # Routes to list treaties, show the new treaty form, and create a new treaty
-    resources :treaties, only: [:index, :new, :create, :edit, :update, :destroy]
+    resources :treaties, only: [ :index, :new, :create, :edit, :update, :destroy ]
     # Display participants and save new participant records
-    resources :treaty_participants, only: [:index, :create]
+    resources :treaty_participants, only: [ :index, :create ]
   end
 
   namespace :user do
     # Provides only a country list and individual country pages
     # No routes for creating, editing, or deleting countries
-    resources :countries, only: [:index, :show]
+    resources :countries, only: [ :index, :show ]
     # Display the event directory and individual event details
-    resources :geopolitical_events, only: [:index, :show]
+    resources :geopolitical_events, only: [ :index, :show ]
     # Read-only diplomatic relationship list and details pages
-    resources :diplomatic_relationships, only: [:index, :show]
+    resources :diplomatic_relationships, only: [ :index, :show ]
     # Read-only treaty directory and individual treaty pages
-    resources :treaties, only: [:index, :show]
+    resources :treaties, only: [ :index, :show ]
   end
 
   root "home#index"

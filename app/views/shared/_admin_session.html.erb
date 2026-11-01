@@ -1,0 +1,13 @@
+<%# Keep account controls available throughout the application. %>
+<div class="geo-home">
+  <div class="container py-2 d-flex flex-wrap justify-content-end align-items-center gap-3">
+    <% if current_admin %>
+      <span>Signed in as <%= current_admin.name %></span>
+      <%= link_to "Admin workspace", admin_countries_path, class: "geo-accent" %>
+      <%= button_to "Sign out", admin_logout_path, method: :delete,
+          form: { data: { turbo: false } }, class: "btn geo-button btn-sm" %>
+    <% else %>
+      <%= link_to "Admin sign in", admin_login_path, class: "geo-accent" %>
+    <% end %>
+  </div>
+</div>

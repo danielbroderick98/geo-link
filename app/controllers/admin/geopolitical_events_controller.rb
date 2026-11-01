@@ -1,7 +1,7 @@
 module Admin
-  class GeopoliticalEventsController < ApplicationController
+  class GeopoliticalEventsController < Admin::BaseController
     # Find the saved event before editing or updating it.
-    before_action :set_geopolitical_event, only: [:edit, :update]
+    before_action :set_geopolitical_event, only: [ :edit, :update ]
 
     def index
       load_events

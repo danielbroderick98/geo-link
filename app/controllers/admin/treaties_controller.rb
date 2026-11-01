@@ -1,6 +1,6 @@
-class Admin::TreatiesController < ApplicationController
+class Admin::TreatiesController < Admin::BaseController
   # Find the saved treaty before editing, updating, or deleting it.
-  before_action :set_treaty, only: [:edit, :update, :destroy]
+  before_action :set_treaty, only: [ :edit, :update, :destroy ]
 
   def index
     # Load the treaty list and the countries available in the form.
@@ -122,7 +122,7 @@ class Admin::TreatiesController < ApplicationController
       if country
         # Add the country ID and prevent duplicate selections.
         @treaty.country_ids = (
-          @treaty.country_ids + [country.id]
+          @treaty.country_ids + [ country.id ]
         ).uniq
       else
         @treaty.errors.add(
