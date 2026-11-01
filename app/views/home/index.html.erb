@@ -59,6 +59,21 @@
           user_countries_path,
           class: "btn geo-button" %>
 
+      <%# Open the read-only geopolitical event directory. %>
+      <%= link_to "Explore geopolitical events",
+          user_geopolitical_events_path,
+          class: "btn geo-button" %>
+
+      <%# Open the read-only diplomatic relationship directory. %>
+      <%= link_to "Explore diplomatic relationships",
+          user_diplomatic_relationships_path,
+          class: "btn geo-button" %>
+
+      <%# Open the read-only treaty directory. %>
+      <%= link_to "Explore treaties",
+          user_treaties_path,
+          class: "btn geo-button" %>
+
       <div class="col-lg-5">
         <section id="project-status" class="card geo-card rounded-4">
           <div class="card-body p-4 p-lg-5">

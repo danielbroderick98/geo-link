@@ -1,0 +1,242 @@
+<%# Use the existing Geo Link background and styling. %>
+<div class="geo-home min-vh-100">
+  <header class="border-bottom border-secondary">
+    <%# Display the shared navigation for all user pages. %>
+    <%= render "user/shared/header" %>
+  </header>
+
+  <main class="container py-5">
+    <div class="mb-4">
+      <%= link_to "← Back to home",
+          root_path,
+          class: "geo-accent text-decoration-none small" %>
+    </div>
+
+    <%# Introduce the read-only treaty directory. %>
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+      <div>
+        <p class="geo-accent small fw-bold text-uppercase mb-2">
+          Explore Geo Link
+        </p>
+
+        <h1 class="display-6 fw-bold">
+          Treaties
+        </h1>
+
+        <p class="geo-muted mb-0">
+          Explore treaties, their details, and participating countries.
+        </p>
+      </div>
+
+      <%# Count the treaties matching the current search and filter. %>
+      <span class="badge rounded-pill geo-badge px-3 py-2">
+        <%= pluralize(@treaties.size, "treaty") %>
+      </span>
+    </div>
+
+    <section
+      class="card geo-card rounded-4 mb-4"
+      aria-labelledby="treaty-search-heading"
+    >
+      <div class="card-body p-4">
+        <h2 id="treaty-search-heading" class="h5 mb-3">
+          Search and filter treaties
+        </h2>
+
+        <%# Use a normal Rails GET submission without JavaScript. %>
+        <%= form_with url: user_treaties_path,
+            method: :get,
+            local: true,
+            data: { turbo: false } do |form| %>
+
+          <%# Keep the input, dropdown, and button aligned. %>
+          <div class="row g-3 align-items-end">
+            <div class="col-md-6">
+              <%= form.label :query,
+                  "Treaty name",
+                  class: "form-label" %>
+
+              <%= form.search_field :query,
+                  value: @query,
+                  placeholder: "Enter a treaty name",
+                  class: "form-control geo-input" %>
+            </div>
+
+            <div class="col-md-3">
+              <%= form.label :status,
+                  "Treaty status",
+                  class: "form-label" %>
+
+              <%# Show the statuses saved by admins and preserve
+                  the currently selected filter. %>
+              <%= form.select :status,
+                  options_for_select(
+                    [["All statuses", ""]] +
+                      @statuses.map { |status| [status, status] },
+                    @status
+                  ),
+                  {},
+                  class: "form-select geo-input" %>
+            </div>
+
+            <div class="col-md-3">
+              <%= form.submit "Search",
+                  class: "btn geo-button w-100" %>
+            </div>
+          </div>
+
+          <%# Remove both search and status parameters. %>
+          <% if @query.present? || @status.present? %>
+            <div class="mt-3">
+              <%= link_to "Clear search and filters",
+                  user_treaties_path,
+                  class: "btn btn-outline-light btn-sm" %>
+            </div>
+          <% end %>
+        <% end %>
+      </div>
+    </section>
+
+    <section
+      class="card geo-card rounded-4"
+      aria-labelledby="treaty-directory-heading"
+    >
+      <div class="card-body p-4">
+        <h2 id="treaty-directory-heading" class="h4 mb-2">
+          Treaty directory
+        </h2>
+
+        <%# Describe the search and filter currently applied. %>
+        <div class="geo-muted small mb-4">
+          <% if @query.present? %>
+            <p class="mb-1">
+              Search results for “<%= @query %>”.
+            </p>
+          <% end %>
+
+          <p class="mb-0">
+            <% if @status.present? %>
+              Treaty status: <%= @status %>.
+            <% else %>
+              Showing all treaty statuses.
+            <% end %>
+          </p>
+        </div>
+
+        <% if @treaties.any? %>
+          <%# Allow horizontal scrolling on smaller screens. %>
+          <div class="table-responsive">
+            <table class="table geo-table align-middle mb-0">
+              <caption class="visually-hidden">
+                Treaties, their status, and participating countries.
+              </caption>
+
+              <thead>
+                <tr>
+                  <th scope="col">Treaty</th>
+                  <th scope="col">Date signed</th>
+                  <th scope="col">Status</th>
+                  <th scope="col">Countries involved</th>
+                  <th scope="col">Details</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                <%# Display one read-only row per treaty. %>
+                <% @treaties.each do |treaty| %>
+                  <tr>
+                    <th scope="row" class="py-3">
+                      <div class="fw-semibold">
+                        <%= link_to treaty.name,
+                            user_treaty_path(treaty),
+                            class: "geo-accent text-decoration-none" %>
+                      </div>
+
+                      <%# Keep descriptions short in the directory.
+                          The details page displays the full text. %>
+                      <% if treaty.description.present? %>
+                        <div class="geo-muted small fw-normal mt-1">
+                          <%= truncate(treaty.description, length: 140) %>
+                        </div>
+                      <% end %>
+                    </th>
+
+                    <td class="text-nowrap">
+                      <%= treaty.date_signed&.strftime("%d %b %Y") || "Not available" %>
+                    </td>
+
+                    <td>
+                      <% if treaty.status.present? %>
+                        <span class="badge rounded-pill geo-badge">
+                          <%= treaty.status %>
+                        </span>
+                      <% else %>
+                        <span class="geo-muted">
+                          Not available
+                        </span>
+                      <% end %>
+                    </td>
+
+                    <td>
+                      <%# Link participating countries to their user profiles. %>
+                      <% if treaty.countries.any? %>
+                        <ul class="list-unstyled mb-0">
+                          <% treaty.countries.sort_by(&:name).each do |country| %>
+                            <li>
+                              <%= link_to country.name,
+                                  user_country_path(country),
+                                  class: "geo-accent text-decoration-none" %>
+                            </li>
+                          <% end %>
+                        </ul>
+                      <% else %>
+                        <span class="geo-muted">
+                          No countries listed
+                        </span>
+                      <% end %>
+                    </td>
+
+                    <td class="text-nowrap">
+                      <%= link_to "View details",
+                          user_treaty_path(treaty),
+                          class: "btn btn-sm geo-button",
+                          aria: {
+                            label: "View details for #{treaty.name}"
+                          } %>
+                    </td>
+                  </tr>
+                <% end %>
+              </tbody>
+            </table>
+          </div>
+        <% else %>
+          <div class="text-center py-5">
+            <% if @query.present? || @status.present? %>
+              <%# The search or filter returned no matching treaties. %>
+              <h3 class="h5">
+                No matching treaties
+              </h3>
+
+              <p class="geo-muted mb-3">
+                Try another treaty name or choose a different status.
+              </p>
+
+              <%= link_to "Show all treaties",
+                  user_treaties_path,
+                  class: "btn geo-button" %>
+            <% else %>
+              <%# No treaties have been added yet. %>
+              <h3 class="h5">
+                No treaties available yet
+              </h3>
+
+              <p class="geo-muted mb-0">
+                Treaties will appear here once they have been added.
+              </p>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+    </section>
+  </main>
+</div>

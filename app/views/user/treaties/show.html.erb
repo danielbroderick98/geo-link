@@ -1,0 +1,130 @@
+<%# Match the styling of the treaty directory. %>
+<div class="geo-home min-vh-100">
+  <header class="border-bottom border-secondary">
+    <%# Display the shared navigation for all user pages. %>
+    <%= render "user/shared/header" %>
+  </header>
+
+  <main class="container py-5">
+    <div class="mb-4">
+      <%= link_to "← Back to treaties",
+          user_treaties_path,
+          class: "geo-accent text-decoration-none small" %>
+    </div>
+
+    <%# Introduce the selected treaty. %>
+    <div class="mb-4">
+      <p class="geo-accent small fw-bold text-uppercase mb-2">
+        Treaty profile
+      </p>
+
+      <h1 class="display-6 fw-bold">
+        <%= @treaty.name %>
+      </h1>
+
+      <p class="geo-muted mb-0">
+        View treaty details and participating countries.
+      </p>
+
+      <% if @treaty.status.present? %>
+        <span class="badge rounded-pill geo-badge px-3 py-2 mt-3">
+          <%= @treaty.status %>
+        </span>
+      <% end %>
+    </div>
+
+    <div class="row g-4">
+      <div class="col-lg-8">
+        <section
+          class="card geo-card rounded-4"
+          aria-labelledby="treaty-details-heading"
+        >
+          <div class="card-body p-4">
+            <h2 id="treaty-details-heading" class="h4 mb-4">
+              Treaty details
+            </h2>
+
+            <%# Display saved values without editable inputs. %>
+            <dl class="row mb-4">
+              <dt class="col-sm-4 geo-muted">
+                Treaty name
+              </dt>
+
+              <dd class="col-sm-8 mb-3">
+                <%= @treaty.name %>
+              </dd>
+
+              <dt class="col-sm-4 geo-muted">
+                Date signed
+              </dt>
+
+              <dd class="col-sm-8 mb-3">
+                <%= @treaty.date_signed&.strftime("%d %b %Y") || "Not available" %>
+              </dd>
+
+              <dt class="col-sm-4 geo-muted">
+                Status
+              </dt>
+
+              <dd class="col-sm-8 mb-0">
+                <%= @treaty.status.presence || "Not available" %>
+              </dd>
+            </dl>
+
+            <h3 class="h5 mb-3">
+              Description
+            </h3>
+
+            <% if @treaty.description.present? %>
+              <%# Escape saved text and preserve its paragraph breaks. %>
+              <div class="text-break">
+                <%= simple_format(h(@treaty.description)) %>
+              </div>
+            <% else %>
+              <p class="geo-muted mb-0">
+                No description has been provided for this treaty.
+              </p>
+            <% end %>
+          </div>
+        </section>
+      </div>
+
+      <div class="col-lg-4">
+        <section
+          class="card geo-card rounded-4"
+          aria-labelledby="treaty-countries-heading"
+        >
+          <div class="card-body p-4">
+            <h2 id="treaty-countries-heading" class="h4 mb-3">
+              Countries involved
+            </h2>
+
+            <%# Read the countries linked to this treaty.
+                Users can open their profiles but cannot change the links. %>
+            <% if @treaty.countries.any? %>
+              <ul class="list-unstyled mb-0">
+                <% @treaty.countries.sort_by(&:name).each do |country| %>
+                  <li class="mb-3">
+                    <%= link_to country.name,
+                        user_country_path(country),
+                        class: "geo-accent text-decoration-none fw-semibold" %>
+
+                    <% if country.region.present? %>
+                      <div class="geo-muted small mt-1">
+                        <%= country.region %>
+                      </div>
+                    <% end %>
+                  </li>
+                <% end %>
+              </ul>
+            <% else %>
+              <p class="geo-muted mb-0">
+                No countries have been listed for this treaty.
+              </p>
+            <% end %>
+          </div>
+        </section>
+      </div>
+    </div>
+  </main>
+</div>

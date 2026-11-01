@@ -1,0 +1,135 @@
+<%# Use the same styling as the relationship directory. %>
+<div class="geo-home min-vh-100">
+  <header class="border-bottom border-secondary">
+    <%# Display the shared navigation for all user pages. %>
+    <%= render "user/shared/header" %>  
+  </header>
+
+  <main class="container py-5">
+    <div class="mb-4">
+      <%= link_to "← Back to relationships",
+          user_diplomatic_relationships_path,
+          class: "geo-accent text-decoration-none small" %>
+    </div>
+
+    <%# Display the two countries identifying this relationship. %>
+    <div class="mb-4">
+      <p class="geo-accent small fw-bold text-uppercase mb-2">
+        Relationship profile
+      </p>
+
+      <h1 class="display-6 fw-bold">
+        <%= @diplomatic_relationship.country_1.name %>
+        and
+        <%= @diplomatic_relationship.country_2.name %>
+      </h1>
+
+      <p class="geo-muted mb-0">
+        View the diplomatic relationship recorded between these countries.
+      </p>
+    </div>
+
+    <section
+      class="card geo-card rounded-4 mb-4"
+      aria-labelledby="relationship-details-heading"
+    >
+      <div class="card-body p-4">
+        <h2 id="relationship-details-heading" class="h4 mb-4">
+          Relationship details
+        </h2>
+
+        <%# Present saved values without editable inputs. %>
+        <dl class="row mb-0">
+          <dt class="col-sm-4 geo-muted">
+            Country 1
+          </dt>
+
+          <dd class="col-sm-8 mb-4">
+            <%= link_to @diplomatic_relationship.country_1.name,
+                user_country_path(@diplomatic_relationship.country_1),
+                class: "geo-accent text-decoration-none" %>
+          </dd>
+
+          <dt class="col-sm-4 geo-muted">
+            Country 2
+          </dt>
+
+          <dd class="col-sm-8 mb-4">
+            <%= link_to @diplomatic_relationship.country_2.name,
+                user_country_path(@diplomatic_relationship.country_2),
+                class: "geo-accent text-decoration-none" %>
+          </dd>
+
+          <dt class="col-sm-4 geo-muted">
+            Relationship type
+          </dt>
+
+          <dd class="col-sm-8 mb-0">
+            <span class="badge rounded-pill geo-badge">
+              <%= @diplomatic_relationship.relationship_type %>
+            </span>
+          </dd>
+        </dl>
+      </div>
+    </section>
+
+    <%# Display a profile card for each country in the relationship. %>
+    <div class="row g-4">
+      <% [
+        @diplomatic_relationship.country_1,
+        @diplomatic_relationship.country_2
+      ].each do |country| %>
+        <div class="col-md-6">
+          <section class="card geo-card rounded-4 h-100">
+            <div class="card-body p-4">
+              <h2 class="h4 mb-3">
+                <%= country.name %>
+              </h2>
+
+              <dl class="row mb-3">
+                <dt class="col-sm-4 geo-muted">
+                  Region
+                </dt>
+
+                <dd class="col-sm-8">
+                  <%= country.region.presence || "Not available" %>
+                </dd>
+
+                <dt class="col-sm-4 geo-muted">
+                  Capital
+                </dt>
+
+                <dd class="col-sm-8">
+                  <%= country.capital.presence || "Not available" %>
+                </dd>
+
+                <dt class="col-sm-4 geo-muted">
+                  Status
+                </dt>
+
+                <dd class="col-sm-8">
+                  <% if country.active? %>
+                    <span class="badge rounded-pill geo-badge">
+                      Active
+                    </span>
+                  <% else %>
+                    <span class="badge rounded-pill bg-secondary text-white">
+                      Inactive
+                    </span>
+                  <% end %>
+                </dd>
+              </dl>
+
+              <%= link_to "View country profile",
+                  user_country_path(country),
+                  class: "btn geo-button",
+                  aria: {
+                    label: "View country profile for #{country.name}"
+                  } %>
+            </div>
+          </section>
+        </div>
+      <% end %>
+    </div>
+  </main>
+</div>

@@ -1,0 +1,137 @@
+<%# Match the styling of the event directory. %>
+<div class="geo-home min-vh-100">
+  <header class="border-bottom border-secondary">
+    <%# Display the shared navigation for all user pages. %>
+    <%= render "user/shared/header" %>
+  </header>
+
+  <main class="container py-5">
+    <div class="mb-4">
+      <%= link_to "← Back to events",
+          user_geopolitical_events_path,
+          class: "geo-accent text-decoration-none small" %>
+    </div>
+
+    <%# Display the selected event's title and status. %>
+    <div class="mb-4">
+      <p class="geo-accent small fw-bold text-uppercase mb-2">
+        Event profile
+      </p>
+
+      <h1 class="display-6 fw-bold">
+        <%= @geopolitical_event.title %>
+      </h1>
+
+      <div class="d-flex flex-wrap gap-2 mt-3">
+        <span class="badge rounded-pill geo-badge px-3 py-2">
+          <%= @geopolitical_event.event_type %>
+        </span>
+
+        <% if @geopolitical_event.ongoing? %>
+          <span class="badge rounded-pill geo-badge px-3 py-2">
+            Ongoing
+          </span>
+        <% else %>
+          <span class="badge rounded-pill bg-secondary text-white px-3 py-2">
+            Ended
+          </span>
+        <% end %>
+      </div>
+    </div>
+
+    <div class="row g-4">
+      <div class="col-lg-8">
+        <section
+          class="card geo-card rounded-4"
+          aria-labelledby="event-details-heading"
+        >
+          <div class="card-body p-4">
+            <h2 id="event-details-heading" class="h4 mb-4">
+              Event details
+            </h2>
+
+            <%# Display the saved event fields without editable inputs. %>
+            <dl class="row mb-4">
+              <dt class="col-sm-4 geo-muted">
+                Event type
+              </dt>
+
+              <dd class="col-sm-8 mb-3">
+                <%= @geopolitical_event.event_type %>
+              </dd>
+
+              <dt class="col-sm-4 geo-muted">
+                Started on
+              </dt>
+
+              <dd class="col-sm-8 mb-3">
+                <%= @geopolitical_event.started_on&.strftime("%d %b %Y") || "Not available" %>
+              </dd>
+
+              <dt class="col-sm-4 geo-muted">
+                Ended on
+              </dt>
+
+              <dd class="col-sm-8 mb-0">
+                <% if @geopolitical_event.ongoing? %>
+                  Ongoing — no end date recorded
+                <% else %>
+                  <%= @geopolitical_event.ended_on.strftime("%d %b %Y") %>
+                <% end %>
+              </dd>
+            </dl>
+
+            <h3 class="h5 mb-3">
+              Description
+            </h3>
+
+            <%# Display the full description and preserve paragraph breaks.
+                Escape saved text before adding paragraph formatting. %>
+            <div class="text-break">
+              <%= simple_format(
+                    h(@geopolitical_event.description)
+                  ) %>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <div class="col-lg-4">
+        <section
+          class="card geo-card rounded-4"
+          aria-labelledby="event-countries-heading"
+        >
+          <div class="card-body p-4">
+            <h2 id="event-countries-heading" class="h4 mb-3">
+              Countries involved
+            </h2>
+
+            <%# Read countries through the existing event_countries
+                association defined in the model. %>
+            <% if @geopolitical_event.countries.any? %>
+              <ul class="list-unstyled mb-0">
+                <% @geopolitical_event.countries.sort_by(&:name).each do |country| %>
+                  <li class="mb-3">
+                    <%= link_to country.name,
+                        user_country_path(country),
+                        class: "geo-accent text-decoration-none fw-semibold" %>
+
+                    <% if country.region.present? %>
+                      <div class="geo-muted small mt-1">
+                        <%= country.region %>
+                      </div>
+                    <% end %>
+                  </li>
+                <% end %>
+              </ul>
+            <% else %>
+              <p class="geo-muted mb-0">
+                No countries have been listed for this event.
+              </p>
+            <% end %>
+          </div>
+        </section>
+      </div>
+    </div>
+  </main>
+</div>

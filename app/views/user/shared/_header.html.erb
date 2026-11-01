@@ -1,0 +1,53 @@
+<%# Shared navigation used by every user page. %>
+<header class="border-bottom border-secondary">
+  <nav
+    class="container py-4 d-flex flex-wrap justify-content-between align-items-center gap-3"
+    aria-label="Main navigation"
+  >
+    <%# Return to the homepage through the Geo Link brand. %>
+    <%= link_to root_path,
+        class: "fs-3 fw-bold text-decoration-none text-light" do %>
+      Geo<span class="geo-accent">Link</span>
+    <% end %>
+
+    <%# Display the same navigation links throughout the user area.
+        Identify the current section on both list and details pages. %>
+    <div class="d-flex flex-wrap gap-3">
+      <%= link_to "Countries",
+          user_countries_path,
+          class: "geo-accent text-decoration-none",
+          aria: {
+            current: (
+              controller_path == "user/countries" ? "page" : nil
+            )
+          } %>
+
+      <%= link_to "Geopolitical events",
+          user_geopolitical_events_path,
+          class: "geo-accent text-decoration-none",
+          aria: {
+            current: (
+              controller_path == "user/geopolitical_events" ? "page" : nil
+            )
+          } %>
+
+      <%= link_to "Diplomatic relationships",
+          user_diplomatic_relationships_path,
+          class: "geo-accent text-decoration-none",
+          aria: {
+            current: (
+              controller_path == "user/diplomatic_relationships" ? "page" : nil
+            )
+          } %>
+
+      <%= link_to "Treaties",
+          user_treaties_path,
+          class: "geo-accent text-decoration-none",
+          aria: {
+            current: (
+              controller_path == "user/treaties" ? "page" : nil
+            )
+          } %>
+    </div>
+  </nav>
+</header>

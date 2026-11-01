@@ -8,14 +8,20 @@ Rails.application.routes.draw do
     resources :diplomatic_relationships, only: [:index, :create, :edit, :update, :destroy]
     # Routes to list treaties, show the new treaty form, and create a new treaty
     resources :treaties, only: [:index, :new, :create, :edit, :update, :destroy]
-    # Display participants and save new participant records.
+    # Display participants and save new participant records
     resources :treaty_participants, only: [:index, :create]
   end
 
   namespace :user do
-    # Provides only a country list and individual country pages.
-    # No routes for creating, editing, or deleting countries.
+    # Provides only a country list and individual country pages
+    # No routes for creating, editing, or deleting countries
     resources :countries, only: [:index, :show]
+    # Display the event directory and individual event details
+    resources :geopolitical_events, only: [:index, :show]
+    # Read-only diplomatic relationship list and details pages
+    resources :diplomatic_relationships, only: [:index, :show]
+    # Read-only treaty directory and individual treaty pages
+    resources :treaties, only: [:index, :show]
   end
 
   root "home#index"

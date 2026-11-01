@@ -1,21 +1,8 @@
 <%# Use the existing Geo Link background and styling. %>
 <div class="geo-home min-vh-100">
   <header class="border-bottom border-secondary">
-    <nav
-      class="container py-4 d-flex flex-wrap justify-content-between align-items-center gap-3"
-      aria-label="Main navigation"
-    >
-      <%# Return to the homepage through the brand link. %>
-      <%= link_to root_path,
-          class: "fs-3 fw-bold text-decoration-none text-light" do %>
-        Geo<span class="geo-accent">Link</span>
-      <% end %>
-
-      <%= link_to "Countries",
-          user_countries_path,
-          class: "geo-accent text-decoration-none",
-          aria: { current: "page" } %>
-    </nav>
+    <%# Display the shared navigation for all user pages. %>
+    <%= render "user/shared/header" %>
   </header>
 
   <main class="container py-5">

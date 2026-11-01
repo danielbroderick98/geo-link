@@ -1,0 +1,252 @@
+<%# Use the existing Geo Link background and styling. %>
+<div class="geo-home min-vh-100">
+  <header class="border-bottom border-secondary">
+    <%# Display the shared navigation for all user pages. %>
+    <%= render "user/shared/header" %>
+  </header>
+
+  <main class="container py-5">
+    <div class="mb-4">
+      <%= link_to "← Back to home",
+          root_path,
+          class: "geo-accent text-decoration-none small" %>
+    </div>
+
+    <%# Introduce the event directory. %>
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+      <div>
+        <p class="geo-accent small fw-bold text-uppercase mb-2">
+          Explore Geo Link
+        </p>
+
+        <h1 class="display-6 fw-bold">
+          Geopolitical events
+        </h1>
+
+        <p class="geo-muted mb-0">
+          Explore events, their timelines, and the countries involved.
+        </p>
+      </div>
+
+      <%# Show the number of events matching the current filters. %>
+      <span class="badge rounded-pill geo-badge px-3 py-2">
+        <%= pluralize(@geopolitical_events.size, "event") %>
+      </span>
+    </div>
+
+    <section
+      class="card geo-card rounded-4 mb-4"
+      aria-labelledby="event-search-heading"
+    >
+      <div class="card-body p-4">
+        <h2 id="event-search-heading" class="h5 mb-3">
+          Search and filter events
+        </h2>
+
+        <%# Submit search and status together using a normal GET request.
+            No JavaScript is required. %>
+        <%= form_with url: user_geopolitical_events_path,
+            method: :get,
+            local: true,
+            data: { turbo: false } do |form| %>
+
+          <div class="row g-3 align-items-end">
+            <div class="col-md-6">
+              <%= form.label :query,
+                  "Event title",
+                  class: "form-label" %>
+
+              <%= form.search_field :query,
+                  value: @query,
+                  placeholder: "Enter an event title",
+                  class: "form-control geo-input" %>
+            </div>
+
+            <div class="col-md-3">
+              <%= form.label :status,
+                  "Event status",
+                  class: "form-label" %>
+
+              <%# Keep the selected filter visible after searching. %>
+              <%= form.select :status,
+                  options_for_select(
+                    [
+                      ["All events", ""],
+                      ["Ongoing", "ongoing"],
+                      ["Ended", "ended"]
+                    ],
+                    @status
+                  ),
+                  {},
+                  class: "form-select geo-input" %>
+            </div>
+
+            <div class="col-md-3">
+              <%= form.submit "Search",
+                  class: "btn geo-button w-100" %>
+            </div>
+          </div>
+
+          <%# Clear both controls by opening the unfiltered directory. %>
+          <% if @query.present? || @status.present? %>
+            <div class="mt-3">
+              <%= link_to "Clear search and filters",
+                  user_geopolitical_events_path,
+                  class: "btn btn-outline-light btn-sm" %>
+            </div>
+          <% end %>
+        <% end %>
+      </div>
+    </section>
+
+    <section
+      class="card geo-card rounded-4"
+      aria-labelledby="event-directory-heading"
+    >
+      <div class="card-body p-4">
+        <h2 id="event-directory-heading" class="h4 mb-2">
+          Event directory
+        </h2>
+
+        <%# Explain the search and filter currently applied. %>
+        <div class="geo-muted small mb-4">
+          <% if @query.present? %>
+            <p class="mb-1">
+              Search results for “<%= @query %>”.
+            </p>
+          <% end %>
+
+          <p class="mb-0">
+            <% if @status == "ongoing" %>
+              Showing ongoing events.
+            <% elsif @status == "ended" %>
+              Showing ended events.
+            <% else %>
+              Showing all events.
+            <% end %>
+          </p>
+        </div>
+
+        <% if @geopolitical_events.any? %>
+          <%# Allow horizontal scrolling on smaller screens. %>
+          <div class="table-responsive">
+            <table class="table geo-table align-middle mb-0">
+              <caption class="visually-hidden">
+                Geopolitical events, their dates, and countries involved.
+              </caption>
+
+              <thead>
+                <tr>
+                  <th scope="col">Event</th>
+                  <th scope="col">Event type</th>
+                  <th scope="col">Started on</th>
+                  <th scope="col">Ended on / Status</th>
+                  <th scope="col">Countries involved</th>
+                  <th scope="col">Details</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                <% @geopolitical_events.each do |event| %>
+                  <tr>
+                    <th scope="row" class="py-3">
+                      <div class="fw-semibold">
+                        <%= link_to event.title,
+                            user_geopolitical_event_path(event),
+                            class: "geo-accent text-decoration-none" %>
+                      </div>
+
+                      <%# Keep long descriptions compact in the directory.
+                          The details page displays the full description. %>
+                      <div class="geo-muted small fw-normal mt-1">
+                        <%= truncate(event.description, length: 140) %>
+                      </div>
+                    </th>
+
+                    <td>
+                      <%= event.event_type %>
+                    </td>
+
+                    <td class="text-nowrap">
+                      <%= event.started_on&.strftime("%d %b %Y") || "Not available" %>
+                    </td>
+
+                    <td class="text-nowrap">
+                      <%# Use the existing model method to identify
+                          events without an end date. %>
+                      <% if event.ongoing? %>
+                        <span class="badge rounded-pill geo-badge">
+                          Ongoing
+                        </span>
+                      <% else %>
+                        <div>
+                          <%= event.ended_on.strftime("%d %b %Y") %>
+                        </div>
+
+                        <span class="badge rounded-pill bg-secondary text-white mt-1">
+                          Ended
+                        </span>
+                      <% end %>
+                    </td>
+
+                    <td>
+                      <%# Link each participating country to its user page. %>
+                      <% if event.countries.any? %>
+                        <ul class="list-unstyled mb-0">
+                          <% event.countries.sort_by(&:name).each do |country| %>
+                            <li>
+                              <%= link_to country.name,
+                                  user_country_path(country),
+                                  class: "geo-accent text-decoration-none" %>
+                            </li>
+                          <% end %>
+                        </ul>
+                      <% else %>
+                        <span class="geo-muted">
+                          No countries listed
+                        </span>
+                      <% end %>
+                    </td>
+
+                    <td class="text-nowrap">
+                      <%= link_to "View details",
+                          user_geopolitical_event_path(event),
+                          class: "btn btn-sm geo-button",
+                          aria: {
+                            label: "View details for #{event.title}"
+                          } %>
+                    </td>
+                  </tr>
+                <% end %>
+              </tbody>
+            </table>
+          </div>
+        <% else %>
+          <div class="text-center py-5">
+            <% if @query.present? || @status.present? %>
+              <h3 class="h5">
+                No matching events
+              </h3>
+
+              <p class="geo-muted mb-3">
+                Try another event title or choose a different status.
+              </p>
+
+              <%= link_to "Show all events",
+                  user_geopolitical_events_path,
+                  class: "btn geo-button" %>
+            <% else %>
+              <h3 class="h5">
+                No events available yet
+              </h3>
+
+              <p class="geo-muted mb-0">
+                Events will appear here once they have been added.
+              </p>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+    </section>
+  </main>
+</div>

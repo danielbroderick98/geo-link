@@ -1,0 +1,219 @@
+<%# Use the existing Geo Link background and styling. %>
+<div class="geo-home min-vh-100">
+  <header class="border-bottom border-secondary">
+    <%# Display the shared navigation for all user pages. %>
+    <%= render "user/shared/header" %>
+  </header>
+
+  <main class="container py-5">
+    <div class="mb-4">
+      <%= link_to "← Back to home",
+          root_path,
+          class: "geo-accent text-decoration-none small" %>
+    </div>
+
+    <%# Introduce the read-only relationship directory. %>
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+      <div>
+        <p class="geo-accent small fw-bold text-uppercase mb-2">
+          Explore Geo Link
+        </p>
+
+        <h1 class="display-6 fw-bold">
+          Diplomatic relationships
+        </h1>
+
+        <p class="geo-muted mb-0">
+          Explore the diplomatic relationships recorded between countries.
+        </p>
+      </div>
+
+      <%# Count the relationships matching the search and filter. %>
+      <span class="badge rounded-pill geo-badge px-3 py-2">
+        <%= pluralize(@diplomatic_relationships.size, "relationship") %>
+      </span>
+    </div>
+
+    <section
+      class="card geo-card rounded-4 mb-4"
+      aria-labelledby="relationship-search-heading"
+    >
+      <div class="card-body p-4">
+        <h2 id="relationship-search-heading" class="h5 mb-3">
+          Search and filter relationships
+        </h2>
+
+        <%# Submit both controls using a normal Rails GET request.
+            No JavaScript is required. %>
+        <%= form_with url: user_diplomatic_relationships_path,
+            method: :get,
+            local: true,
+            data: { turbo: false } do |form| %>
+
+          <%# Align the bottoms of the input, dropdown, and button.
+              Helper text is placed outside this row. %>
+          <div class="row g-3 align-items-end">
+            <div class="col-md-6">
+              <%= form.label :query,
+                  "Country name",
+                  class: "form-label" %>
+
+              <%= form.search_field :query,
+                  value: @query,
+                  placeholder: "e.g. Ireland",
+                  class: "form-control geo-input",
+                  aria: { describedby: "country-search-help" } %>
+            </div>
+
+            <div class="col-md-3">
+              <%= form.label :relationship_type,
+                  "Relationship type",
+                  class: "form-label" %>
+
+              <%# Populate the dropdown from saved relationship types.
+                  Preserve the selected type after submitting. %>
+              <%= form.select :relationship_type,
+                  options_for_select(
+                    [["All types", ""]] +
+                      @relationship_types.map { |type| [type, type] },
+                    @relationship_type
+                  ),
+                  {},
+                  class: "form-select geo-input" %>
+            </div>
+
+            <div class="col-md-3">
+              <%= form.submit "Search",
+                  class: "btn geo-button w-100" %>
+            </div>
+          </div>
+
+          <%# Keep this outside the row so it does not push
+              the dropdown and Search button down. %>
+          <p id="country-search-help" class="geo-muted small mt-2 mb-0">
+            Searches both countries in each relationship.
+          </p>
+
+          <%# Reset both controls by opening the unfiltered directory. %>
+          <% if @query.present? || @relationship_type.present? %>
+            <div class="mt-3">
+              <%= link_to "Clear search and filters",
+                  user_diplomatic_relationships_path,
+                  class: "btn btn-outline-light btn-sm" %>
+            </div>
+          <% end %>
+        <% end %>
+      </div>
+    </section>
+
+    <section
+      class="card geo-card rounded-4"
+      aria-labelledby="relationship-directory-heading"
+    >
+      <div class="card-body p-4">
+        <h2 id="relationship-directory-heading" class="h4 mb-2">
+          Relationship directory
+        </h2>
+
+        <%# Describe the currently applied search and filter. %>
+        <div class="geo-muted small mb-4">
+          <% if @query.present? %>
+            <p class="mb-1">
+              Relationships involving countries matching “<%= @query %>”.
+            </p>
+          <% end %>
+
+          <p class="mb-0">
+            <% if @relationship_type.present? %>
+              Relationship type: <%= @relationship_type %>.
+            <% else %>
+              Showing all relationship types.
+            <% end %>
+          </p>
+        </div>
+
+        <% if @diplomatic_relationships.any? %>
+          <%# Allow horizontal scrolling on smaller screens. %>
+          <div class="table-responsive">
+            <table class="table geo-table align-middle mb-0">
+              <caption class="visually-hidden">
+                Diplomatic relationships and the countries involved.
+              </caption>
+
+              <thead>
+                <tr>
+                  <th scope="col">Country 1</th>
+                  <th scope="col">Country 2</th>
+                  <th scope="col">Relationship type</th>
+                  <th scope="col">Details</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                <%# Display one read-only row per relationship. %>
+                <% @diplomatic_relationships.each do |relationship| %>
+                  <tr>
+                    <th scope="row" class="py-3 fw-semibold">
+                      <%= link_to relationship.country_1.name,
+                          user_country_path(relationship.country_1),
+                          class: "geo-accent text-decoration-none" %>
+                    </th>
+
+                    <td>
+                      <%= link_to relationship.country_2.name,
+                          user_country_path(relationship.country_2),
+                          class: "geo-accent text-decoration-none" %>
+                    </td>
+
+                    <td>
+                      <%# Display the type entered by the admin. %>
+                      <span class="badge rounded-pill geo-badge">
+                        <%= relationship.relationship_type %>
+                      </span>
+                    </td>
+
+                    <td class="text-nowrap">
+                      <%# Open the relationship's read-only details page. %>
+                      <%= link_to "View details",
+                          user_diplomatic_relationship_path(relationship),
+                          class: "btn btn-sm geo-button",
+                          aria: {
+                            label: "View relationship between #{relationship.country_1.name} and #{relationship.country_2.name}"
+                          } %>
+                    </td>
+                  </tr>
+                <% end %>
+              </tbody>
+            </table>
+          </div>
+        <% else %>
+          <div class="text-center py-5">
+            <% if @query.present? || @relationship_type.present? %>
+              <%# The current search or filter returned no matches. %>
+              <h3 class="h5">
+                No matching relationships
+              </h3>
+
+              <p class="geo-muted mb-3">
+                Try another country name or relationship type.
+              </p>
+
+              <%= link_to "Show all relationships",
+                  user_diplomatic_relationships_path,
+                  class: "btn geo-button" %>
+            <% else %>
+              <%# No relationships have been added yet. %>
+              <h3 class="h5">
+                No diplomatic relationships available yet
+              </h3>
+
+              <p class="geo-muted mb-0">
+                Relationships will appear here once they have been added.
+              </p>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+    </section>
+  </main>
+</div>
