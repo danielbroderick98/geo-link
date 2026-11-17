@@ -6,6 +6,6 @@ class Treaty < ApplicationRecord
   # Access participating countries using treaty.countries.
   has_many :countries, through: :treaty_participants
 
-  # Require a name before saving a treaty.
+  # A treaty can be saved before its optional signing date and description are known.
   validates :name, presence: true
 end

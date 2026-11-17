@@ -1,10 +1,11 @@
 # Public login endpoint; management controllers inherit from Admin::BaseController.
 class Admin::SessionsController < ApplicationController
+  # Limit repeated password attempts against the sign-in endpoint.
   rate_limit to: 10, within: 3.minutes, only: :create,
     with: -> { redirect_to admin_login_path, alert: "Too many attempts. Please try again in a few minutes." }
 
   def new
-    redirect_to admin_countries_path if current_admin
+    redirect_to root_path if current_admin
   end
 
   def create
@@ -16,8 +17,9 @@ class Admin::SessionsController < ApplicationController
     reset_session
     if user&.admin?
       session[:admin_user_id] = user.id
+      # ApplicationController uses this timestamp to expire the sign-in.
       session[:admin_signed_in_at] = Time.current.to_i
-      redirect_to admin_countries_path, notice: "Signed in successfully."
+      redirect_to root_path, notice: "Signed in successfully."
     else
       flash.now[:alert] = "Invalid email or password."
       render :new, status: :unprocessable_entity

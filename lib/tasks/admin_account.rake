@@ -4,6 +4,7 @@ namespace :admin do
     require "io/console"
     abort "Run this task in an interactive terminal." unless $stdin.tty?
 
+    # Collect account details interactively so passwords stay out of shell commands.
     print "Name: "
     name = $stdin.gets.to_s.strip
     print "Email: "
@@ -11,12 +12,14 @@ namespace :admin do
     abort "An account with that email already exists; no account was changed." if User.exists?(email: email)
 
     print "Password (at least 12 characters): "
+    # Hide the password as it is typed in the terminal.
     password = $stdin.noecho(&:gets).to_s.chomp
     puts
     print "Confirm password: "
     confirmation = $stdin.noecho(&:gets).to_s.chomp
     puts
 
+    # Set the role here because this task creates administrator accounts.
     user = User.new(name: name, email: email, password: password,
       password_confirmation: confirmation, role: "admin")
     if user.save

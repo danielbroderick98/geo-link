@@ -77,7 +77,7 @@
                 </p>
               </div>
 
-              <%# Count participant records, rather than unique countries. %>
+              <%# Count the links here. One country can participate in several treaties. %>
               <span class="badge rounded-pill geo-badge">
                 <%= pluralize(@treaty_participants.size, "participant") %>
               </span>

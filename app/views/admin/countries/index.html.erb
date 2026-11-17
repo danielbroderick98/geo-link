@@ -90,7 +90,7 @@
               </span>
             </div>
 
-            <%# Search and filter using a GET request, keeping filters in the URL. %>
+            <%# Keep search and status in the URL so refreshing the page keeps the same results. %>
             <%= form_with url: admin_countries_path,
                 method: :get,
                 class: "mb-4" do |form| %>

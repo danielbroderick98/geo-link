@@ -35,4 +35,9 @@ class Country < ApplicationRecord
 
   # Access this country's treaties using country.treaties.
   has_many :treaties, through: :treaty_participants
+
+  # Follow the country links to find the events used by the timeline.
+  has_many :event_countries
+  # Specify the singular source because EventCountry also defines a plural association.
+  has_many :geopolitical_events, through: :event_countries, source: :geopolitical_event
 end

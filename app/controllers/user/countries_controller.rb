@@ -17,7 +17,7 @@ class User::CountriesController < ApplicationController
       escaped_query = Country.sanitize_sql_like(@query.downcase)
 
       # Search for names containing the entered text.
-      # The parameter placeholder keeps user input out of the SQL itself.
+      # Bind the entered text separately so it is used as a search value.
       @countries = @countries.where(
         "LOWER(name) LIKE ?",
         "%#{escaped_query}%"
@@ -39,5 +39,10 @@ class User::CountriesController < ApplicationController
     # Load the selected country.
     # Rails returns a 404 response if it does not exist.
     @country = Country.find(params[:id])
+    # Only pass this country's linked records to the timeline library.
+    @timeline = GeoLink::CountryTimeline.build(
+      treaties: @country.treaties,
+      events: @country.geopolitical_events
+    )
   end
 end

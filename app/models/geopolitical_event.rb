@@ -21,7 +21,7 @@ class GeopoliticalEvent < ApplicationRecord
 
     # Add a validation error if the event ends before it starts.
     def ended_on_cannot_precede_started_on
-        # Only compare dates when both have been provided.
+        # Leave missing-field errors to the presence checks and allow an open-ended event.
         return if started_on.blank? || ended_on.blank?
 
     if ended_on < started_on

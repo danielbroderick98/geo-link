@@ -155,8 +155,7 @@
                               class: "btn btn-sm geo-button",
                               data: { turbo: false } %>
 
-                          <%# Submit a Rails delete form.
-                              No JavaScript is required. %>
+                          <%# Use a form button so deletion sends a DELETE request to the treaty controller. %>
                           <%= button_to "Delete",
                               admin_treaty_path(treaty),
                               method: :delete,

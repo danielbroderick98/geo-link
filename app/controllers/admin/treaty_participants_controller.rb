@@ -1,4 +1,4 @@
-# Use the same parent controller as your other admin controllers.
+# Require an admin sign-in before allowing access to treaty participant records.
 class Admin::TreatyParticipantsController < Admin::BaseController
   def index
     # Prepare an empty record for the form.
@@ -14,7 +14,7 @@ class Admin::TreatyParticipantsController < Admin::BaseController
       redirect_to admin_treaty_participants_path,
       notice: "Treaty participant added successfully."
     else
-      # Reload the dropdowns and table while keeping validation errors.
+      # Refill both dropdowns and the table while keeping the rejected participant.
       load_page_data
       render :index, status: :unprocessable_entity
     end

@@ -52,9 +52,8 @@ class Admin::TreatiesController < Admin::BaseController
     @editing_treaty = @treaty
 
     if country_selection_request?
-      # Use an unsaved object while choosing countries.
-      # This prevents country selections from changing the database
-      # before Save changes is clicked.
+      # Changing country_ids on a saved treaty can write its links immediately.
+      # Use a fresh form object until the admin clicks Save changes.
       @treaty = Treaty.new(treaty_params)
 
       change_country_selection
@@ -142,7 +141,7 @@ class Admin::TreatiesController < Admin::BaseController
   end
 
   def form_response_status
-    # Return an error status when the country selection is invalid.
+    # An invalid dropdown choice adds a form error and needs a 422 response.
     @treaty.errors.any? ? :unprocessable_entity : :ok
   end
 

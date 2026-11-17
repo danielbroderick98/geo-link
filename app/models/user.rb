@@ -1,7 +1,8 @@
 class User < ApplicationRecord
+  # bcrypt stores a password digest and checks passwords during admin sign-in.
   has_secure_password
 
-  # Store email addresses consistently.
+  # Trim and lowercase email addresses before checking their format and uniqueness.
   before_validation :normalize_email
 
   validates :name, presence: true

@@ -36,7 +36,7 @@ class User::DiplomaticRelationshipsController < ApplicationController
         .where("LOWER(name) LIKE ?", "%#{escaped_query}%")
         .select(:id)
 
-      # Match the country in either position in a relationship.
+      # Either country can match, regardless of which dropdown the admin used.
       @diplomatic_relationships = @diplomatic_relationships
         .where(country_1_id: matching_country_ids)
         .or(

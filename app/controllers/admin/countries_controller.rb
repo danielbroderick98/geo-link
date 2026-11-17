@@ -48,8 +48,7 @@ class Admin::CountriesController < Admin::BaseController
   def destroy
     @country = Country.find(params[:id])
 
-    # Roll back associated deletions if a linked record
-    # prevents the country from being deleted.
+    # Keep the country and its dependent links together if deletion is blocked.
     Country.transaction do
       @country.destroy!
     end
@@ -81,7 +80,7 @@ class Admin::CountriesController < Admin::BaseController
       search = "%#{Country.sanitize_sql_like(@query.downcase)}%"
 
       # Search country names and regions without matching letter case.
-      # Named parameters keep the submitted value out of the SQL itself.
+      # Bind the search value separately from the SQL so it is treated as data.
       @countries = @countries.where(
         "LOWER(name) LIKE :search OR LOWER(region) LIKE :search",
         search: search

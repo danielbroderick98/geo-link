@@ -2,7 +2,7 @@ class TreatyParticipant < ApplicationRecord
   # Each participant record belongs to one treaty.
   belongs_to :treaty
 
-  # Each participant record represents one country.
+  # Together, these foreign keys link a country to a treaty.
   belongs_to :country
 
   # Show a helpful validation error for duplicate participants.

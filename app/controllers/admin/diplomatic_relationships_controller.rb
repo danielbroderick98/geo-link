@@ -20,7 +20,7 @@ module Admin
             redirect_to admin_diplomatic_relationships_path,
                 notice: "Diplomatic relationship added successfully."
         else
-            # Reload the page data and display any validation errors.
+            # Refill the country dropdowns and table while keeping the invalid form object.
             load_relationships
             load_countries
             render :index, status: :unprocessable_entity
@@ -38,7 +38,7 @@ module Admin
             redirect_to admin_diplomatic_relationships_path,
                 notice: "Diplomatic relationship updated successfully."
         else
-            # Keep the entered values and display validation errors.
+            # The edit view still needs the country choices when validation fails.
             load_countries
             render :edit, status: :unprocessable_entity
         end

@@ -1,0 +1,31 @@
+/* The geo-landing classes belong to the homepage layout. */
+.geo-landing { background: radial-gradient(ellipse at 85% 5%, #1c3545 0, transparent 42%), #101e36; }
+.geo-landing-header { border-bottom: 1px solid #34445b; }
+.geo-landing-nav { color: #c4edb2; text-decoration: none; font-size: .9rem; font-weight: 600; }
+.geo-landing-nav:hover { color: #e1f9d6; text-decoration: underline; }
+.geo-landing-intro { padding: 5rem 0 3.5rem; max-width: 850px; }
+.geo-landing-eyebrow { color: #c4edb2; font-size: .75rem; font-weight: 700; letter-spacing: .15em; text-transform: uppercase; }
+.geo-landing-intro h1 { font-size: clamp(2.8rem, 6vw, 5rem); font-weight: 700; line-height: 1.08; letter-spacing: -.045em; margin: 1.25rem 0 1.5rem; }
+.geo-landing-description { color: #b9c5d4; font-size: 1.12rem; line-height: 1.75; max-width: 590px; margin: 0; }
+.geo-landing-directory { scroll-margin-top: 2rem; }
+.geo-directory-card { display: flex; flex-direction: column; height: 100%; padding: 1.5rem; border: 1px solid #344b60; border-radius: 1rem; background: #182942; color: #f4f7f2; text-decoration: none; transition: background-color .15s, border-color .15s; }
+.geo-directory-card:hover { color: #f4f7f2; background: #20364c; border-color: #c4edb2; }
+.geo-directory-card:focus-visible, .geo-landing a:focus-visible { outline: 3px solid #c4edb2; outline-offset: 5px; }
+.geo-directory-number { color: #a7b8c9; font-size: .8rem; letter-spacing: .08em; }
+.geo-directory-arrow { color: #c4edb2; font-size: 1.4rem; }
+.geo-directory-card h3 { font-size: 1.15rem; line-height: 1.4; font-weight: 600; }
+.geo-directory-card p { color: #b9c5d4; font-size: .9rem; line-height: 1.7; margin-bottom: 1.5rem; }
+/* Push each card's action to the bottom even when descriptions wrap differently. */
+.geo-directory-action { color: #c4edb2; font-size: .85rem; font-weight: 600; margin-top: auto; }
+.geo-world-section { padding: 4rem 0; }
+.geo-world-frame { border: 1px solid #4c6171; border-radius: 1rem; overflow: hidden; background: #182942; }
+.geo-world-frame iframe { display: block; width: 100%; height: 410px; border: 0; }
+.geo-landing-admin { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1.5rem; padding: 1.5rem; margin-bottom: 3rem; border: 1px solid #34445b; border-radius: 1rem; }
+@media (max-width: 575.98px) {
+  .geo-landing-intro { padding: 3rem 0 2.5rem; }
+  .geo-directory-card { padding: 1.25rem; }
+  .geo-world-section { padding: 3rem 0; }
+  .geo-world-frame iframe { height: 300px; }
+}
+/* Respect the visitor's preference to reduce movement during hover changes. */
+@media (prefers-reduced-motion: reduce) { .geo-directory-card { transition: none; } }

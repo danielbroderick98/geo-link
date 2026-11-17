@@ -11,7 +11,7 @@
   </div>
 <% end %>
 
-<%# Both a treaty and a country must exist before adding participants. %>
+<%# Check both lists before offering a participant submission because both IDs are required. %>
 <% missing_options = @treaties.empty? || @countries.empty? %>
 
 <% if missing_options %>

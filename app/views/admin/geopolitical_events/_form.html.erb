@@ -95,7 +95,7 @@
           Your selections are saved when you save the event.
         </p>
 
-        <%# Always submit the country_ids array, even when it is empty. %>
+        <%# Send a blank country ID too, so removing every country still submits the selection. %>
         <%= hidden_field_tag "#{form.object_name}[country_ids][]",
             "",
             id: nil %>

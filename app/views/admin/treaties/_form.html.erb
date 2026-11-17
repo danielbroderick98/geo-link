@@ -51,7 +51,7 @@
         class: "form-control geo-input" %>
   </div>
 
-  <%# Status remains a free-text field. %>
+  <%# Saved status text also supplies the choices in the public treaty filter. %>
   <div class="mb-3">
     <%= form.label :status,
         class: "form-label" %>
@@ -131,7 +131,7 @@
               <%= country.name %>
             </span>
 
-            <%# Preserve this selected country on the next submission. %>
+            <%# Carry each selected country through the next Add, Remove, or Save submission. %>
             <%= hidden_field_tag "treaty[country_ids][]",
                 country.id,
                 id: nil %>

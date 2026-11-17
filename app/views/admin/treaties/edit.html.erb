@@ -36,7 +36,7 @@
               Update the treaty's details and participating countries.
             </p>
 
-            <%# Reuse the same form used when adding a treaty. %>
+            <%# Use the shared form so country selection and validation work the same way when editing. %>
             <%= render "form", treaty: @treaty %>
 
             <%# Discard unsaved edits by returning to the list. %>

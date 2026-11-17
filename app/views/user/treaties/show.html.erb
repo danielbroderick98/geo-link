@@ -76,7 +76,7 @@
             </h3>
 
             <% if @treaty.description.present? %>
-              <%# Escape saved text and preserve its paragraph breaks. %>
+              <%# Escape the saved description while keeping paragraph breaks in the displayed text. %>
               <div class="text-break">
                 <%= simple_format(h(@treaty.description)) %>
               </div>

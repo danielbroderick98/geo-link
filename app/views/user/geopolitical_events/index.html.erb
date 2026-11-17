@@ -87,7 +87,7 @@
             </div>
           </div>
 
-          <%# Clear both controls by opening the unfiltered directory. %>
+          <%# Open the directory URL with no parameters to clear both search and status. %>
           <% if @query.present? || @status.present? %>
             <div class="mt-3">
               <%= link_to "Clear search and filters",

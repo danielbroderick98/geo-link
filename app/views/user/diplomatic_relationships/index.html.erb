@@ -70,7 +70,7 @@
                   "Relationship type",
                   class: "form-label" %>
 
-              <%# Populate the dropdown from saved relationship types.
+              <%# Use the types loaded by the controller so this filter follows the saved records.
                   Preserve the selected type after submitting. %>
               <%= form.select :relationship_type,
                   options_for_select(

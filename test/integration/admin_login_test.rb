@@ -18,6 +18,7 @@ class AdminLoginTest < ActionDispatch::IntegrationTest
   end
 
   test "direct write requests cannot bypass login" do
+    # Try write requests directly, as hiding management links alone would not block them.
     [ [ :post, admin_countries_path ], [ :patch, admin_country_path(countries(:one)) ],
       [ :delete, admin_country_path(countries(:one)) ],
       [ :post, admin_geopolitical_events_path ],
@@ -30,8 +31,13 @@ class AdminLoginTest < ActionDispatch::IntegrationTest
   end
 
   test "valid admin can sign in and logout removes access" do
+    # Include spaces and capitals to check the same email handling as the login form.
     post admin_login_path, params: { email: " ADMIN-LOGIN@example.com ", password: "GeoLink-test-password" }
-    assert_redirected_to admin_countries_path
+    assert_redirected_to root_path
+    follow_redirect!
+    assert_select "h1", text: /Manage your/
+    assert_select ".geo-directory-card[href=?]", admin_countries_path
+    assert_select ".geo-directory-card[href=?]", user_countries_path, count: 0
     get admin_countries_path
     assert_response :success
     delete admin_logout_path
@@ -53,6 +59,7 @@ class AdminLoginTest < ActionDispatch::IntegrationTest
 
   test "changing an admin role revokes access on the next request" do
     post admin_login_path, params: { email: @admin.email, password: "GeoLink-test-password" }
+    # Change the saved role while the browser still holds an admin session.
     @admin.update!(role: "user")
     get admin_countries_path
     assert_response :forbidden

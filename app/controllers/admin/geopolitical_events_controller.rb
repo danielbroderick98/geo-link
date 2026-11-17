@@ -77,7 +77,7 @@ module Admin
     end
 
     def country_picker_request?
-      # These buttons update the form rather than save the event.
+      # The picker buttons share the event form and identify their action here.
       params[:country_action] == "add" || params[:remove_country].present?
     end
 
@@ -95,7 +95,7 @@ module Admin
         ids.delete(params[:remove_country].to_s)
       end
 
-      # Keep valid country IDs and prevent duplicate selections.
+      # Look up the submitted IDs so repeated or missing countries are left out.
       @selected_country_ids = Country
         .where(id: ids.reject(&:blank?).uniq)
         .pluck(:id)

@@ -30,8 +30,7 @@ class User::GeopoliticalEventsController < ApplicationController
       )
     end
 
-    # Follow the model's definition:
-    # no end date means ongoing; an end date means ended.
+    # Match ongoing? in the model by checking whether an end date is saved.
     case @status
     when "ongoing"
       @geopolitical_events = @geopolitical_events.where(

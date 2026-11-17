@@ -127,7 +127,7 @@
                         <% end %>
                     </td>
 
-                    <%# Display all countries linked through event_countries. %>
+                    <%# Read the countries linked through event_countries, which the controller loads with the events. %>
                     <td>
                         <% if event.countries.any? %>
                         <%= event.countries.map(&:name).sort.join(", ") %>

@@ -1,8 +1,10 @@
 class ApplicationController < ActionController::Base
   helper_method :current_admin
 
-  # Recheck the saved role on every request; sessions expire after eight hours.
+  # Check the saved role again on each request so a role change revokes access.
+  # The timestamp also limits each sign-in to eight hours.
   def current_admin
+    # Reuse the result when the layout and controller both check the current admin.
     return @current_admin if defined?(@current_admin)
 
     signed_in_at = session[:admin_signed_in_at].to_i

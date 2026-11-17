@@ -66,7 +66,7 @@
                     <%= form.label :country_1_id, "Country 1",
                         class: "form-label" %>
 
-                    <%# Use country IDs as values and names as visible labels. %>
+                    <%# Submit country IDs so records with similar names can still be identified correctly. %>
                     <%= form.collection_select :country_1_id,
                         @countries, :id, :name,
                         { prompt: "Select Country 1" },

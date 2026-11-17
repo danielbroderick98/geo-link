@@ -11,7 +11,7 @@ class DiplomaticRelationship < ApplicationRecord
 
   private
 
-  # Keep this validation method internal to the model.
+  # A relationship must link two different countries.
   def different_countries
     # Check that Country 1 is selected and both country IDs match.
     if country_1_id.present? && country_1_id == country_2_id

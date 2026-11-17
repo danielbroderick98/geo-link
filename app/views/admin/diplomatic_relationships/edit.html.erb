@@ -44,7 +44,7 @@
                     <%= form.label :country_1_id, "Country 1",
                         class: "form-label" %>
 
-                    <%# Automatically select the relationship's current country. %>
+                    <%# Use the saved country ID to select the current value in this dropdown. %>
                     <%= form.collection_select :country_1_id,
                         @countries, :id, :name,
                         { prompt: "Select Country 1" },

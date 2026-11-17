@@ -10,7 +10,7 @@
   </div>
 <% end %>
 
-<%# Submit the country details to the create action. %>
+<%# Rails uses the record's saved state to choose between adding and updating a country. %>
 <%= form_with model: [:admin, country] do |form| %>
   <div class="mb-3">
     <%= form.label :name, "Country name", class: "form-label" %>

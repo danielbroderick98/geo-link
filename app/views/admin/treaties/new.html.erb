@@ -1,7 +1,7 @@
 <%# Page heading. %>
 <h1>Add treaty</h1>
 
-<%# Display the shared form using the controller's treaty object. %>
+<%# Pass the treaty object into the shared form so it can display any validation errors. %>
 <%= render "form", treaty: @treaty %>
 
 <%# Return to the list without submitting the form. %>

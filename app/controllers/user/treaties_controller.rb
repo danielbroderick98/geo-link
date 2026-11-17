@@ -4,8 +4,7 @@ class User::TreatiesController < ApplicationController
     # Preserve the submitted treaty-name search.
     @query = params[:query].to_s.strip
 
-    # Populate the status filter using values entered by admins.
-    # This keeps status as free text in the admin area.
+    # Build the dropdown from saved statuses so new admin-entered values appear here.
     @statuses = Treaty
       .where.not(status: [nil, ""])
       .distinct

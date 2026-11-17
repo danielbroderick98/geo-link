@@ -93,7 +93,7 @@
           </dt>
 
           <dd class="col-sm-8 mb-0">
-            <%# Display the status set on the admin Countries page. %>
+            <%# Show the saved active flag so the public profile agrees with country management. %>
             <% if @country.active? %>
               <span class="badge rounded-pill geo-badge">
                 Active
@@ -105,6 +105,45 @@
             <% end %>
           </dd>
         </dl>
+      </div>
+    </section>
+
+    <section
+      id="country-timeline"
+      class="card geo-card rounded-4 mt-4"
+      aria-labelledby="country-timeline-heading"
+    >
+      <div class="card-body p-4">
+        <h2 id="country-timeline-heading" class="h4 mb-4">
+          Country timeline
+        </h2>
+
+        <%# Explain an empty timeline when no linked records have usable dates. %>
+        <% if @timeline.empty? %>
+          <p class="geo-muted mb-0">There are no timeline entries for this country yet.</p>
+        <% else %>
+          <ul class="list-unstyled mb-0">
+            <% @timeline.each do |entry| %>
+              <li class="mb-2">
+                <time class="geo-muted me-2" datetime="<%= entry.date.iso8601 %>">
+                  <%= entry.date.strftime("%d %b %Y") %>
+                </time>
+
+                <%# Each record type has its own public detail page. %>
+                <% if entry.type == :treaty %>
+                  <%= link_to entry.title, user_treaty_path(entry.record_id), class: "geo-accent" %>
+                <% else %>
+                  <%= link_to entry.title, user_geopolitical_event_path(entry.record_id), class: "geo-accent" %>
+                <% end %>
+
+                <%# The library carries the event's ongoing status into the entry. %>
+                <% if entry.ongoing %>
+                  <span class="badge rounded-pill geo-badge">Ongoing</span>
+                <% end %>
+              </li>
+            <% end %>
+          </ul>
+        <% end %>
       </div>
     </section>
   </main>
