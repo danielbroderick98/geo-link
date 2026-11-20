@@ -43,53 +43,63 @@
           Search and filter treaties
         </h2>
 
-        <%# Use a normal Rails GET submission without JavaScript. %>
-        <%= form_with url: user_treaties_path,
-            method: :get,
-            local: true,
-            data: { turbo: false } do |form| %>
+        <% if @search_errors.any? %>
+          <div class="alert alert-danger" role="alert">
+            <ul class="mb-0">
+              <% @search_errors.each do |message| %>
+                <li><%= message %></li>
+              <% end %>
+            </ul>
+          </div>
+        <% end %>
 
-          <%# Keep the input, dropdown, and button aligned. %>
+        <%# GET keeps the selected filters in the URL for bookmarks and page refreshes. %>
+        <%= search_form_for @q, url: user_treaties_path,
+            method: :get, html: { data: { turbo: false } } do |form| %>
           <div class="row g-3 align-items-end">
             <div class="col-md-6">
-              <%= form.label :query,
-                  "Treaty name",
-                  class: "form-label" %>
+              <%= form.label :name_i_cont, "Treaty name", class: "form-label" %>
+              <%# i_cont searches part of the name and ignores letter case. %>
+              <%= form.search_field :name_i_cont, value: @query,
+                  placeholder: "Enter a treaty name", class: "form-control geo-input" %>
+            </div>
 
-              <%= form.search_field :query,
-                  value: @query,
-                  placeholder: "Enter a treaty name",
+            <div class="col-md-6">
+              <%= form.label :status_eq, "Treaty status", class: "form-label" %>
+              <%# eq matches the selected status exactly. %>
+              <%= form.select :status_eq,
+                  options_for_select([ [ "All statuses", "" ] ] + @statuses.map { |status| [ status, status ] }, @status),
+                  {}, class: "form-select geo-input" %>
+            </div>
+
+            <%# Either boundary can be left blank to search an open-ended date range. %>
+            <div class="col-md-6 col-xl-3">
+              <%= form.label :date_signed_gteq, "Signing date from", class: "form-label" %>
+              <%= form.date_field :date_signed_gteq, value: @signed_from,
                   class: "form-control geo-input" %>
             </div>
 
-            <div class="col-md-3">
-              <%= form.label :status,
-                  "Treaty status",
-                  class: "form-label" %>
-
-              <%# Show the statuses saved by admins and preserve
-                  the currently selected filter. %>
-              <%= form.select :status,
-                  options_for_select(
-                    [["All statuses", ""]] +
-                      @statuses.map { |status| [status, status] },
-                    @status
-                  ),
-                  {},
-                  class: "form-select geo-input" %>
+            <div class="col-md-6 col-xl-3">
+              <%= form.label :date_signed_lteq, "Signing date until", class: "form-label" %>
+              <%= form.date_field :date_signed_lteq, value: @signed_until,
+                  class: "form-control geo-input" %>
             </div>
 
-            <div class="col-md-3">
-              <%= form.submit "Search",
-                  class: "btn geo-button w-100" %>
+            <div class="col-md-8 col-xl-4">
+              <%= form.label :s, "Sort by", class: "form-label" %>
+              <%= form.select :s, options_for_select(@sort_options, @sort),
+                  {}, class: "form-select geo-input" %>
+            </div>
+
+            <div class="col-md-4 col-xl-2">
+              <%= form.submit "Search", class: "btn geo-button w-100" %>
             </div>
           </div>
 
-          <%# Use the plain directory URL to clear the name search and status selection together. %>
-          <% if @query.present? || @status.present? %>
+          <%# The plain directory URL clears the filters and restores alphabetical order. %>
+          <% if @filters_active %>
             <div class="mt-3">
-              <%= link_to "Clear search and filters",
-                  user_treaties_path,
+              <%= link_to "Clear search and filters", user_treaties_path,
                   class: "btn btn-outline-light btn-sm" %>
             </div>
           <% end %>
@@ -122,6 +132,13 @@
             <% end %>
           </p>
         </div>
+
+        <% if @signed_from || @signed_until %>
+          <p class="geo-muted small mb-4">
+            Signing dates from <%= @signed_from || "any date" %>
+            until <%= @signed_until || "any date" %>.
+          </p>
+        <% end %>
 
         <% if @treaties.any? %>
           <%# Allow horizontal scrolling on smaller screens. %>
@@ -211,14 +228,16 @@
           </div>
         <% else %>
           <div class="text-center py-5">
-            <% if @query.present? || @status.present? %>
+            <% if @search_errors.any? %>
+              <p class="geo-muted mb-0">Correct the signing dates above and search again.</p>
+            <% elsif @filters_active %>
               <%# The search or filter returned no matching treaties. %>
               <h3 class="h5">
                 No matching treaties
               </h3>
 
               <p class="geo-muted mb-3">
-                Try another treaty name or choose a different status.
+                Try another treaty name, status, or signing date range.
               </p>
 
               <%= link_to "Show all treaties",

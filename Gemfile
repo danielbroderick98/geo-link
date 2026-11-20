@@ -64,3 +64,6 @@ group :test do
   gem "capybara"
   gem "selenium-webdriver"
 end
+
+# Search, filter and sort the public treaty directory.
+gem "ransack", "~> 6.1"
