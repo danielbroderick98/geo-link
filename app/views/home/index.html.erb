@@ -1,61 +1,109 @@
-<div class="geo-home d-flex flex-column min-vh-100">
-  <header class="container py-4">
-    <nav class="d-flex justify-content-between align-items-center"
-         aria-label="Main navigation">
-      <a href="/" class="fs-3 fw-bold text-decoration-none text-light">
+<% content_for :title, current_admin ? "Admin workspace | Geo Link" : "Geo Link | Explore a connected world" %>
+<div class="geo-home geo-landing d-flex flex-column min-vh-100">
+  <header class="geo-landing-header">
+    <nav class="container py-4 d-flex flex-wrap justify-content-between align-items-center gap-3"
+         aria-label="Homepage navigation">
+      <%= link_to root_path, class: "fs-3 fw-bold text-decoration-none text-light" do %>
         Geo<span class="geo-accent">Link</span>
-      </a>
-
-      <span class="badge rounded-pill geo-badge px-3 py-2">
-        Development underway
-      </span>
+      <% end %>
+      <a href="#explore" class="geo-landing-nav"><%= current_admin ? "Manage records" : "Explore the directory" %> <span aria-hidden="true">↗</span></a>
     </nav>
   </header>
 
-  <main class="container flex-grow-1 py-5">
-    <div class="row align-items-center g-5 py-lg-5">
-      <div class="col-lg-7">
-        <p class="geo-accent small fw-bold text-uppercase">
-          Welcome to Geo Link
-        </p>
+  <main class="container flex-grow-1">
+    <section class="geo-landing-intro" aria-labelledby="welcome-heading">
+      <% if current_admin %>
+        <p class="geo-landing-eyebrow">Admin workspace</p>
+        <h1 id="welcome-heading">Manage your<br><span class="geo-accent">connected world.</span></h1>
+        <p class="geo-landing-description">Add, edit and maintain Geo Link's countries, treaties,
+          geopolitical events and diplomatic relationships.</p>
+      <% else %>
+      <p class="geo-landing-eyebrow">Countries. Agreements. Connections.</p>
+      <h1 id="welcome-heading">Understand a<br><span class="geo-accent">connected world.</span></h1>
+      <p class="geo-landing-description">Explore the countries, treaties and events shaping our world,
+        and discover the relationships between them.</p>
+      <% end %>
+    </section>
 
-        <h1 class="display-3 fw-bold mb-4">
-          A world of possibilities.<br>
-          <span class="geo-accent">Connected.</span>
-        </h1>
-
-        <p class="lead geo-muted mb-4">
-          A new connection starts here. We're building Geo Link,
-          and this is just the beginning.
-        </p>
-
-        <a href="#project-status" class="btn geo-button btn-lg">
-          Explore the project &rarr;
-        </a>
+    <%# Choose management links for signed-in admins and directory links for public visitors. %>
+    <section id="explore" class="geo-landing-directory" aria-labelledby="directory-heading">
+      <div class="d-flex flex-wrap justify-content-between align-items-baseline gap-2 mb-4">
+        <h2 id="directory-heading" class="h5 mb-0"><%= current_admin ? "Manage records" : "Choose where to start" %></h2>
+        <span class="geo-muted small"><%= current_admin ? "Choose a section to add, edit or remove records." : "Open to everyone. No account needed." %></span>
       </div>
-
-      <div class="col-lg-5">
-        <section id="project-status" class="card geo-card rounded-4">
-          <div class="card-body p-4 p-lg-5">
-            <span class="geo-accent small fw-semibold">
-              Our first milestone
-            </span>
-
-            <h2 class="h3 mt-3 mb-3">Our foundation is ready.</h2>
-
-            <p class="geo-muted mb-0">
-              Ruby on Rails is running, our project is on GitHub,
-              and Geo Link has its first Bootstrap homepage.
-            </p>
+      <div class="row g-3">
+        <% sections = if current_admin
+          [
+            ["01", "Manage countries", "Add and edit country profiles, details and statuses.", admin_countries_path],
+            ["02", "Manage treaties", "Update agreements and their participating countries.", admin_treaties_path],
+            ["03", "Manage events", "Create and update events and the countries involved.", admin_geopolitical_events_path],
+            ["04", "Manage relationships", "Maintain diplomatic relationships between countries.", admin_diplomatic_relationships_path]
+          ]
+        else
+          [
+          ["01", "Countries", "Discover country profiles, regions and political systems.", user_countries_path],
+          ["02", "Treaties", "Explore international agreements and the countries involved.", user_treaties_path],
+          ["03", "Geopolitical events", "Follow ongoing and past developments around the world.", user_geopolitical_events_path],
+          ["04", "Diplomatic relationships", "See how countries connect with one another.", user_diplomatic_relationships_path]
+        ]
+        end %>
+        <% sections.each do |number, title, description, path| %>
+          <div class="col-sm-6 col-xl-3">
+            <%= link_to path, class: "geo-directory-card" do %>
+              <div class="d-flex justify-content-between align-items-center mb-4">
+                <span class="geo-directory-number"><%= number %></span>
+                <span class="geo-directory-arrow" aria-hidden="true">↗</span>
+              </div>
+              <h3><%= title %></h3>
+              <p><%= description %></p>
+              <span class="geo-directory-action"><%= current_admin ? "Open management" : "Explore" %> <span aria-hidden="true">→</span></span>
+            <% end %>
           </div>
-        </section>
+        <% end %>
       </div>
-    </div>
+    </section>
+
+    <%# Administrators can still preview the public directories below their management cards. %>
+    <% if current_admin %>
+      <nav class="d-flex flex-wrap gap-3 mt-4" aria-label="Preview public directories">
+        <span class="geo-muted">View public pages:</span>
+        <%= link_to "Countries", user_countries_path, class: "geo-accent" %>
+        <%= link_to "Treaties", user_treaties_path, class: "geo-accent" %>
+        <%= link_to "Events", user_geopolitical_events_path, class: "geo-accent" %>
+        <%= link_to "Relationships", user_diplomatic_relationships_path, class: "geo-accent" %>
+      </nav>
+    <% end %>
+
+    <section class="geo-world-section" aria-labelledby="world-heading">
+      <div class="d-flex flex-wrap justify-content-between align-items-end gap-3 mb-4">
+        <div>
+          <p class="geo-landing-eyebrow mb-2">A wider perspective</p>
+          <h2 id="world-heading" class="h3 mb-2">Explore the world</h2>
+          <p class="geo-muted mb-0">Pan and zoom to get your bearings, then explore a country in the directory.</p>
+        </div>
+        <%= link_to "Browse countries →", user_countries_path, class: "geo-landing-nav" %>
+      </div>
+      <div class="geo-world-frame">
+        <%# OpenStreetMap provides the map controls; no custom JavaScript or API key is needed.
+            This geographic map is independent of Geo Link's database records. %>
+        <iframe title="Interactive world map from OpenStreetMap"
+                src="https://www.openstreetmap.org/export/embed.html?bbox=-25%2C20%2C55%2C65&amp;layer=mapnik"
+                loading="lazy" referrerpolicy="strict-origin-when-cross-origin"
+                allowfullscreen></iframe>
+      </div>
+      <div class="d-flex flex-wrap justify-content-between gap-2 mt-3 small geo-muted">
+        <span>Map data © <a href="https://www.openstreetmap.org/copyright" class="geo-accent">OpenStreetMap contributors</a></span>
+        <a href="https://www.openstreetmap.org/#map=2/20/0" target="_blank" rel="noopener noreferrer"
+           class="geo-accent">Open larger map <span aria-hidden="true">↗</span><span class="visually-hidden"> (opens a new tab)</span></a>
+      </div>
+    </section>
+
   </main>
 
   <footer class="container">
-    <div class="geo-footer py-4">
-      <p class="small geo-muted mb-0">Geo Link · Built to connect.</p>
+    <div class="geo-footer py-4 d-flex flex-wrap justify-content-between gap-2">
+      <p class="small geo-muted mb-0">Geo Link · A world of connections.</p>
+      <span class="small geo-muted">Countries · Treaties · Events · Relationships</span>
     </div>
   </footer>
 </div>
