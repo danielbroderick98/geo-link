@@ -7,7 +7,7 @@ class User::DiplomaticRelationshipsController < ApplicationController
     # Build the filter from saved relationship types.
     # Types remain free text in the admin area.
     @relationship_types = DiplomaticRelationship
-      .where.not(relationship_type: [nil, ""])
+      .where.not(relationship_type: [ nil, "" ])
       .distinct
       .order(:relationship_type)
       .pluck(:relationship_type)

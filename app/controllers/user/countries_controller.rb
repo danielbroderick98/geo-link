@@ -31,7 +31,7 @@ class User::CountriesController < ApplicationController
     when "inactive"
       # Include older records with an unset status because the
       # existing views also display these as inactive.
-      @countries = @countries.where(active: [false, nil])
+      @countries = @countries.where(active: [ false, nil ])
     end
   end
 

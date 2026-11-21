@@ -1,20 +1,13 @@
 class CreateTreaties < ActiveRecord::Migration[8.1]
   def change
-    create_table :treaty_participants do |t|
-      # Link this participant record to an existing treaty.
-      t.references :treaty, null: false, foreign_key: true
+    # Store the agreement details here. Participating countries use their own join table.
+    create_table :treaties do |t|
+      t.string :name
+      t.date :date_signed
+      t.string :status
+      t.text :description
 
-      # Link this participant record to an existing country.
-      t.references :country, null: false, foreign_key: true
-
-      # Record when this entry was created and last updated.
       t.timestamps
-      end
-
-      # Prevent the same country from being added to the same treaty twice.
-      add_index :treaty_participants,
-        [:treaty_id, :country_id],
-        unique: true
     end
   end
 end
