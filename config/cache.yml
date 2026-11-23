@@ -12,5 +12,5 @@ test:
   <<: *default
 
 production:
-  database: cache
+  # Use the primary connection, where the cache table is created by migrations.
   <<: *default
