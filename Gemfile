@@ -1,11 +1,12 @@
 source "https://rubygems.org"
 
+# Use the same Ruby version in WSL and on Heroku.
+ruby file: ".ruby-version"
+
 # Bundle edge Rails instead: gem "rails", github: "rails/rails", branch: "main"
 gem "rails", "~> 8.1.4"
 # The modern asset pipeline for Rails [https://github.com/rails/propshaft]
 gem "propshaft"
-# Use sqlite3 as the database for Active Record
-gem "sqlite3", ">= 2.1"
 # Use the Puma web server [https://github.com/puma/puma]
 gem "puma", ">= 5.0"
 # Use JavaScript with ESM import maps [https://github.com/rails/importmap-rails]
@@ -40,7 +41,15 @@ gem "thruster", require: false
 # Use Active Storage variants [https://guides.rubyonrails.org/active_storage_overview.html#transforming-images]
 gem "image_processing", "~> 1.2"
 
+group :production do
+  # Heroku stores the app and Solid adapter tables in PostgreSQL.
+  gem "pg", "~> 1.6"
+end
+
 group :development, :test do
+  # Keep local records and the existing test suite in their SQLite databases.
+  gem "sqlite3", ">= 2.1"
+
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
   gem "debug", platforms: %i[ mri windows ], require: "debug/prelude"
 
